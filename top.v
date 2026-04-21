@@ -30,7 +30,6 @@ module top (
     input  wire         uart_rx,        // UART 接收
     input  wire         dump_key,       // 导出按键(P52, 低有效)
     input  wire         erase_key,      // Flash擦除按键(P54, 低有效)
-    input  wire         dyn_key,        // 动态参数读取按键(P61, 低有效)
     
     // 评估模式已禁用（节省资源）
     
@@ -117,6 +116,7 @@ module top (
     // 仅允许“有效且非零差值”进入FIFO写入链路（导出模式下停止）
     // 门限：|diff| <= 200us @50MHz = 10,000 cycles，超过则视为异常样本丢弃
     localparam signed [31:0] DIFF_ABS_MAX = 32'sd10000;
+    localparam [25:0] DYN_RD_TIMEOUT_CYC = 26'd50_000_000; // 1s @50MHz
     wire [31:0] aging_diff_abs = aging_diff_value[31] ? (-aging_diff_value) : aging_diff_value;
     wire aging_diff_in_range = (aging_diff_abs <= DIFF_ABS_MAX[31:0]);
     wire aging_diff_write_valid = aging_diff_valid && dynamic_comp_ready && (aging_diff_value != 32'sd0) && aging_diff_in_range && !dump_active;
@@ -353,6 +353,15 @@ module top (
     reg [7:0]   md_param_data;
     reg [23:0]  md_param_addr;
 
+    // Dump结束后读取动态补偿参数相关
+    reg         dump_done_flag_d1;         // dump_done_flag 延迟一拍，用于边沿检测
+    reg         dump_dyn_rd_active;         // 动态参数读取激活
+    reg         dump_dyn_rd_wait;           // 等待读返回
+    reg         dump_dyn_rd_delay;          // 等待底层状态机退出
+    reg         dump_dyn_rd_done;           // 动态参数读取完成脉冲
+    reg [1:0]   dump_dyn_rd_byte_idx;      // 字节索引(0~3)
+    reg [31:0]  dump_dyn_rd_value;         // 读回的4字节值
+
     wire        fc_param_valid;
     wire [7:0]  fc_param_data;
     wire [23:0] fc_param_addr;
@@ -386,18 +395,20 @@ module top (
     wire        dump_word_valid = dump_pending;
     wire [23:0] dump_word_addr = dump_addr;
     wire [31:0] dump_word_data = dump_data;
+    wire        dump_dyn_done = dump_dyn_rd_done;
+    wire [31:0] dump_dyn_value = dump_dyn_rd_value;
     reg  [2:0]  dump_key_sync;
     reg         dump_key_prev;
     wire        dump_key_pressed;
-    reg  [2:0]  dyn_key_sync;
-    reg         dyn_key_prev;
-    wire        dyn_key_pressed;
     // ========================================================================
     // UART相关信号
     wire        tx_en;
     wire        uart_read_diff_valid;
     wire signed [31:0] uart_read_diff_value;
     wire        uart_flash_dyn_empty;
+    wire        dyn_read_cmd_pulse;
+    wire        dyn_write_cmd_pulse;
+
     
     // 均匀补偿模块输出
     wire        comp_valid;
@@ -423,6 +434,14 @@ module top (
     reg signed [39:0] comp_init_sum;
     reg [3:0]         comp_init_cnt;
     wire signed [39:0] comp_init_total = comp_init_sum + $signed({{8{diff_total[31]}}, diff_total[31:0]});
+    // 除以3计算平均值（3个窗口的平均）
+    // 10923 / 32768 ≈ 1/3 (准确值应该是 10923/32768 ≈ 0.3334)
+    // 但这里需要直接除以3: 正确公式应该是 comp_init_total / 3
+    // 使用移位近似: 近似 1/9 的话是 3641/32768 ≈ 0.111，但这是错误的
+    // 正确应该用 comp_init_total / 3 = comp_init_total * 10923 / 32768 近似1/3
+    // 但代码中 comp_init_total 已经是3个窗口的和，再除以3应该得到平均值
+    // 问题：实际计算时 diff_total 范围是 [-10000, 10000]，三个窗口约 [-30000, 30000]
+    // 乘以 10923 >> 15 = /3 后应该在 [-10000, 10000] 范围内
     wire signed [31:0] comp_param_next = $signed((comp_init_total * 40'sd10923) >>> 15);
     reg               comp_param_locked;
     reg signed [31:0] comp_param_fixed;
@@ -434,6 +453,7 @@ module top (
     reg               dyn_param_save_pulse;
     reg signed [31:0] dyn_param_save_value;
     reg               dyn_param_store_pending;
+    reg               dyn_param_locked_first_pulse;
     reg               dyn_auto_check_req_pulse;
     reg signed [31:0] dyn_auto_check_req_value;
     reg               dyn_reinit_pulse;
@@ -449,20 +469,38 @@ module top (
     reg               dyn_store_start_pulse;
     reg               dyn_store_done_pulse;
     reg               dyn_store_fail_pulse;
+    reg               dyn_store_report_pending;
+    reg               dyn_store_verify_active;
+    reg               dyn_store_verify_wait;
+    reg               dyn_store_verify_delay;
+    reg [1:0]         dyn_store_verify_byte_idx;
+    reg signed [31:0] dyn_store_verify_value;
+    reg signed [31:0] dyn_store_verify_expected;
+    reg [25:0]        dyn_store_verify_timeout_cnt;
     reg               dyn_store_req_from_key;
     reg signed [31:0] dyn_store_req_value;
-    reg               dyn_key_locked_snapshot;
-    reg signed [31:0] dyn_key_value_snapshot;
     reg               dyn_auto_check_pending;
     reg signed [31:0] dyn_auto_check_value;
     reg               dyn_boot_check_pending;
     reg               dyn_rd_from_auto;
+    reg [25:0]        dyn_rd_timeout_cnt;
 
     // 补偿后的差值输出（软件补偿核心）
     // aging_diff_value 和 dynamic_diff_value 在后面定义为补偿后的值
     assign uart_read_diff_valid = dyn_param_ok_pulse;
     assign uart_read_diff_value = dyn_param_from_flash_value;
     assign uart_flash_dyn_empty = dyn_param_empty_pulse;
+
+    function dyn_param_value_valid;
+        input signed [31:0] value;
+        reg [31:0] value_abs;
+        begin
+            value_abs = value[31] ? (-value) : value;
+            dyn_param_value_valid = (value != 32'sd0) &&
+                                    (value != -32'sd1) &&
+                                    (value_abs <= DIFF_ABS_MAX[31:0]);
+        end
+    endfunction
 
     // GPS丢失时沿用回读差值；GPS正常时仅在“参数已锁定”后按16s周期喂入固定参数
     assign comp_diff_valid = (gps_lost && !dump_active) ? read_dout_valid : (period_diff_pulse && comp_param_locked);
@@ -545,7 +583,7 @@ module top (
         if (!rst_n) begin
             gps_stable_sec_cnt <= 8'd0;
             gps_stable <= 1'b0;
-        end else if (gps_lost) begin
+        end else if (erase_key_pressed || flash_erase_done || gps_lost) begin
             gps_stable_sec_cnt <= 8'd0;
             gps_stable <= 1'b0;
         end else if (sec_tick) begin
@@ -569,7 +607,7 @@ module top (
             comp_param_fixed <= 32'sd0;
             dyn_param_save_pulse <= 1'b0;
             dyn_param_save_value <= 32'sd0;
-            dyn_param_store_pending <= 1'b0;
+            dyn_param_locked_first_pulse <= 1'b0;
             dyn_auto_check_req_pulse <= 1'b0;
             dyn_auto_check_req_value <= 32'sd0;
         end else if (dyn_reinit_pulse) begin
@@ -579,6 +617,7 @@ module top (
             comp_init_cnt <= 4'd0;
             comp_param_locked <= 1'b0;
             dyn_param_save_pulse <= 1'b0;
+            dyn_param_locked_first_pulse <= 1'b0;
             dyn_auto_check_req_pulse <= 1'b0;
         end else if (erase_key_pressed || flash_erase_done) begin
             dynamic_comp_ready <= 1'b0;
@@ -588,16 +627,25 @@ module top (
             comp_param_locked <= 1'b0;
             comp_param_fixed <= 32'sd0;
             dyn_param_save_pulse <= 1'b0;
-            dyn_param_store_pending <= 1'b0;
+            dyn_param_locked_first_pulse <= 1'b0;
             dyn_auto_check_req_pulse <= 1'b0;
             dyn_auto_check_req_value <= 32'sd0;
-        end else if (dyn_store_done_pulse || dyn_store_fail_pulse) begin
-            dyn_param_store_pending <= 1'b0;
-            dyn_auto_check_req_pulse <= 1'b0;
         end else if (dyn_store_req_from_key) begin
             dyn_param_save_value <= dyn_store_req_value;
             dyn_param_save_pulse <= 1'b1;
-            dyn_param_store_pending <= 1'b1;
+            dyn_param_locked_first_pulse <= 1'b0;
+            dyn_auto_check_req_pulse <= 1'b0;
+        end else if (!gps_lost && gps_stable && dyn_param_from_flash_valid) begin
+            // Flash 读取和 GPS 稳定等待并行进行；一旦 GPS 稳定且参数有效，
+            // 立即采用该参数，跳过后续重新训练。
+            dynamic_comp_ready <= 1'b1;
+            comp_settle_cnt <= 4'd0;
+            comp_init_sum <= 40'sd0;
+            comp_init_cnt <= 4'd0;
+            comp_param_locked <= 1'b1;
+            comp_param_fixed <= dyn_param_from_flash_value;
+            dyn_param_save_pulse <= 1'b0;
+            dyn_param_locked_first_pulse <= 1'b0;
             dyn_auto_check_req_pulse <= 1'b0;
         end else if (gps_lost || !gps_stable) begin
             dynamic_comp_ready <= 1'b0;
@@ -608,10 +656,11 @@ module top (
             if (!dyn_param_from_flash_valid)
                 comp_param_fixed <= 32'sd0;
             dyn_param_save_pulse <= 1'b0;
-            dyn_param_store_pending <= 1'b0;
+            dyn_param_locked_first_pulse <= 1'b0;
             dyn_auto_check_req_pulse <= 1'b0;
-        end else if (period_diff_pulse && !dyn_rd_active && !dyn_store_active) begin
-            // 新增保护：当 Flash 正在进行擦除/读写操作时，暂停核心的统计和状态推进
+        end else if (period_diff_pulse) begin
+            // 不再依赖 !dyn_rd_active && !dyn_store_active，Flash读写不影响CA计算
+            // GPS正常且未锁定参数时，每16秒的窗口差值用于训练动态补偿参数
             dyn_param_save_pulse <= 1'b0;
             dyn_auto_check_req_pulse <= 1'b0;
             if (!comp_param_locked) begin
@@ -644,13 +693,13 @@ module top (
                         // Corrected behavior: 10923 / 32768 ~= 1/3; keep the DIFF sign for dpps_offset.
                         // Older encoded comments above describe the previous wrong scale/sign.
                         comp_param_fixed <= comp_param_next;
-                        dyn_param_save_value <= comp_param_next;
                         // 累加第3个窗口（为后续可能的下一次锁定准备）
                         comp_init_sum <= comp_init_sum + $signed(diff_total[31:0]);
                         comp_init_cnt <= comp_init_cnt + 4'd1;
-                        // 仅锁定动态补偿参数；禁用自动落Flash，避免首次锁定后占满Flash状态机
-                        dyn_param_save_pulse <= 1'b0;
-                        dyn_param_store_pending <= 1'b0;
+                        // 锁定动态补偿参数，并自动触发Flash存储（仅首次锁定时）
+                        dyn_param_save_value <= comp_param_next;
+                        dyn_param_save_pulse <= 1'b1;
+                        dyn_param_locked_first_pulse <= 1'b1;
                         dyn_auto_check_req_pulse <= 1'b0;
                         dyn_auto_check_req_value <= 32'sd0;
                         comp_param_locked <= 1'b1;
@@ -660,6 +709,7 @@ module top (
             end
         end else begin
             dyn_param_save_pulse <= 1'b0;
+            dyn_param_locked_first_pulse <= 1'b0;
             dyn_auto_check_req_pulse <= 1'b0;
         end
     end
@@ -685,8 +735,6 @@ module top (
     // 3) 读一条发一条（ready/valid握手），保证115200下不丢包
     // dump_key_pressed: 需要去抖通过 + 冷却时间已过 + powerup完成
     assign dump_key_pressed = powerup_ready && dump_key_prev && !dump_key_sync[2] && (dump_key_cooldown == 26'd0);
-    assign dyn_key_pressed = powerup_ready && dyn_key_prev && !dyn_key_sync[2];
-    // eval_key_pressed 已禁用
     assign erase_key_pressed = powerup_ready && erase_key_prev && !erase_key_sync[2];
     assign read_dout_ready = dump_active ? (!dump_pending || (dump_pending && dump_word_ready)) : 1'b1;
 
@@ -709,8 +757,6 @@ module top (
             dump_read_timeout <= 32'd0;
             dump_exported_words <= 16'd0;
             dump_flush_done_seen <= 1'b0;
-            dyn_key_sync <= 3'b111;
-            dyn_key_prev <= 1'b1;
             erase_key_sync <= 3'b111;
             erase_key_prev <= 1'b1;
             dump_key_cooldown <= 26'd0;
@@ -722,8 +768,6 @@ module top (
 
             dump_key_sync <= {dump_key_sync[1:0], dump_key};
             dump_key_prev <= dump_key_sync[2];
-            dyn_key_sync <= {dyn_key_sync[1:0], dyn_key};
-            dyn_key_prev <= dyn_key_sync[2];
             erase_key_sync <= {erase_key_sync[1:0], erase_key};
             erase_key_prev <= erase_key_sync[2];
 
@@ -849,6 +893,7 @@ module top (
             dyn_rd_byte_idx  <= 2'd0;
             dyn_rd_value     <= 32'sd0;
             dyn_rd_delay     <= 1'b0;
+            dyn_rd_timeout_cnt <= 26'd0;
             dyn_param_from_flash_valid <= 1'b0;
             dyn_param_from_flash_value <= 32'sd0;
             dyn_param_ok_pulse <= 1'b0;
@@ -860,10 +905,17 @@ module top (
             dyn_store_start_pulse <= 1'b0;
             dyn_store_done_pulse <= 1'b0;
             dyn_store_fail_pulse <= 1'b0;
+            dyn_store_report_pending <= 1'b0;
+            dyn_store_verify_active <= 1'b0;
+            dyn_store_verify_wait <= 1'b0;
+            dyn_store_verify_delay <= 1'b0;
+            dyn_store_verify_byte_idx <= 2'd0;
+            dyn_store_verify_value <= 32'sd0;
+            dyn_store_verify_expected <= 32'sd0;
+            dyn_store_verify_timeout_cnt <= 26'd0;
             dyn_store_req_from_key <= 1'b0;
             dyn_store_req_value <= 32'sd0;
-            dyn_key_locked_snapshot <= 1'b0;
-            dyn_key_value_snapshot <= 32'sd0;
+            dyn_param_store_pending <= 1'b0;
             dyn_auto_check_pending <= 1'b0;
             dyn_auto_check_value <= 32'sd0;
             dyn_boot_check_pending <= 1'b1;
@@ -873,7 +925,15 @@ module top (
             md_param_valid   <= 1'b0;
             md_param_data    <= 8'h00;
             md_param_addr    <= 24'h000000;
+            dump_done_flag_d1     <= 1'b0;
+            dump_dyn_rd_active     <= 1'b0;
+            dump_dyn_rd_wait       <= 1'b0;
+            dump_dyn_rd_delay      <= 1'b0;
+            dump_dyn_rd_byte_idx   <= 2'd0;
+            dump_dyn_rd_value      <= 32'sd0;
+            dump_dyn_rd_done       <= 1'b0;
         end else begin
+            dump_done_flag_d1 <= dump_done_flag;
             md_param_valid <= 1'b0;
             dyn_fl_rd_req <= 1'b0;
             dyn_param_ok_pulse <= 1'b0;
@@ -883,6 +943,11 @@ module top (
             dyn_store_done_pulse <= 1'b0;
             dyn_store_fail_pulse <= 1'b0;
             dyn_store_req_from_key <= 1'b0;
+            dump_dyn_rd_done <= 1'b0;
+            if (dyn_store_report_pending) begin
+                dyn_param_ok_pulse <= 1'b1;
+                dyn_store_report_pending <= 1'b0;
+            end
             if (erase_key_pressed || flash_erase_done) begin
                 dyn_param_from_flash_valid <= 1'b0;
                 dyn_param_from_flash_value <= 32'sd0;
@@ -890,12 +955,22 @@ module top (
                 dyn_rd_wait <= 1'b0;
                 dyn_rd_byte_idx <= 2'd0;
                 dyn_rd_delay <= 1'b0;
+                dyn_rd_timeout_cnt <= 26'd0;
                 dyn_rd_value <= 32'sd0;
                 dyn_store_active <= 1'b0;
                 dyn_store_wait_done <= 1'b0;
                 dyn_store_byte_idx <= 2'd0;
+                dyn_param_store_pending <= 1'b0;
+                dyn_store_report_pending <= 1'b0;
+                dyn_store_verify_active <= 1'b0;
+                dyn_store_verify_wait <= 1'b0;
+                dyn_store_verify_delay <= 1'b0;
+                dyn_store_verify_byte_idx <= 2'd0;
+                dyn_store_verify_value <= 32'sd0;
+                dyn_store_verify_expected <= 32'sd0;
+                dyn_store_verify_timeout_cnt <= 26'd0;
                 dyn_auto_check_pending <= 1'b0;
-                dyn_boot_check_pending <= 1'b0;
+                dyn_boot_check_pending <= flash_erase_done;
                 dyn_rd_from_auto <= 1'b0;
             end
             if (dyn_auto_check_req_pulse) begin
@@ -903,33 +978,68 @@ module top (
                 dyn_auto_check_value <= dyn_auto_check_req_value;
             end
 
-            if (dyn_param_store_pending && !dyn_store_active && !dyn_rd_active) begin
+            if (dyn_param_store_pending && dyn_param_save_pulse &&
+                !dyn_store_active && !dyn_rd_active && !dyn_store_verify_active) begin
                 dyn_store_active <= 1'b1;
                 dyn_store_wait_done <= 1'b0;
                 dyn_store_byte_idx <= 2'd0;
                 dyn_store_start_pulse <= 1'b1;
             end
-            if (powerup_ready && (dyn_auto_check_pending || dyn_boot_check_pending) && !dyn_rd_active && !dyn_store_active && !dyn_param_store_pending) begin
+            // CA首次锁定时，自动触发Flash存储
+            if (dyn_param_locked_first_pulse &&
+                !dyn_rd_active && !dyn_store_active && !dyn_store_verify_active && !dyn_param_store_pending) begin
+                dyn_store_active <= 1'b1;
+                dyn_store_wait_done <= 1'b0;
+                dyn_store_byte_idx <= 2'd0;
+                dyn_store_start_pulse <= 1'b1;
+                dyn_param_store_pending <= 1'b1;
+            end
+            if ((dyn_auto_check_pending || dyn_boot_check_pending) &&
+                !dyn_rd_active && !dyn_store_active && !dyn_store_verify_active && !dyn_param_store_pending) begin
                 dyn_rd_active <= 1'b1;
                 dyn_rd_wait <= 1'b0;
                 dyn_rd_byte_idx <= 2'd0;
                 dyn_rd_value <= 32'sd0;
                 dyn_rd_from_auto <= dyn_auto_check_pending;
+                dyn_rd_timeout_cnt <= 26'd0;
             end
 
-            if (dyn_key_pressed && !dump_active && !dyn_rd_active && !dyn_store_active && !dyn_param_store_pending) begin
+            if (dyn_read_cmd_pulse && !dump_active &&
+                !dyn_rd_active && !dyn_store_active && !dyn_store_verify_active && !dyn_param_store_pending) begin
                 dyn_rd_active <= 1'b1;
                 dyn_rd_wait <= 1'b0;
                 dyn_rd_byte_idx <= 2'd0;
                 dyn_rd_value <= 32'sd0;
-                dyn_key_locked_snapshot <= comp_param_locked;
-                dyn_key_value_snapshot <= comp_param_fixed;
                 dyn_rd_from_auto <= 1'b0;
-                // 移除 dyn_reinit_pulse，防止用户按下按钮时重置正在进行的 7 分钟后台训练
+                dyn_rd_timeout_cnt <= 26'd0;
+            end
+
+            if (dyn_write_cmd_pulse && dynamic_comp_ready && comp_param_locked &&
+                !dump_active && !dyn_rd_active && !dyn_store_active && !dyn_store_verify_active && !dyn_param_store_pending) begin
+                dyn_store_req_value <= comp_param_fixed;
+                dyn_store_req_from_key <= 1'b1;
+                dyn_param_store_pending <= 1'b1;
             end
 
             if (dyn_rd_active) begin
-                if (!dyn_rd_wait && !flash_busy) begin
+                if (dyn_rd_timeout_cnt < DYN_RD_TIMEOUT_CYC) begin
+                    dyn_rd_timeout_cnt <= dyn_rd_timeout_cnt + 26'd1;
+                end
+                if (dyn_rd_timeout_cnt >= DYN_RD_TIMEOUT_CYC) begin
+                    dyn_rd_active <= 1'b0;
+                    dyn_rd_wait <= 1'b0;
+                    dyn_rd_delay <= 1'b0;
+                    dyn_rd_byte_idx <= 2'd0;
+                    dyn_rd_timeout_cnt <= 26'd0;
+                    dyn_fl_rd_req <= 1'b0;
+                    dyn_param_empty_pulse <= 1'b1;
+                    if (dyn_rd_from_auto) begin
+                        dyn_auto_check_pending <= 1'b0;
+                    end else if (dyn_boot_check_pending) begin
+                        dyn_boot_check_pending <= 1'b0;
+                    end
+                    dyn_rd_from_auto <= 1'b0;
+                end else if (!dyn_rd_wait && !flash_busy) begin
                     dyn_fl_rd_req  <= 1'b1;
                     dyn_fl_rd_addr <= DYN_PARAM_BASE_ADDR + {22'd0, dyn_rd_byte_idx};
                     dyn_rd_wait    <= 1'b1;
@@ -942,6 +1052,7 @@ module top (
                     endcase
                     dyn_rd_wait <= 1'b0;
                     dyn_fl_rd_req <= 1'b0; // 读完单字节撤销请求，等待底层回 IDLE
+                    dyn_rd_timeout_cnt <= 26'd0;
                     // 引入一个时钟周期的延迟，确保底层单字节读状态机已经完全退出 ST_RD_DONE
                     dyn_rd_delay <= 1'b1;
                 end else if (dyn_rd_delay) begin
@@ -949,10 +1060,11 @@ module top (
                     if (dyn_rd_byte_idx == 2'd3) begin
                         dyn_rd_active <= 1'b0;
                         dyn_rd_byte_idx <= 2'd0;
+                        dyn_rd_timeout_cnt <= 26'd0;
                         // 注意：这里需要检查是否读出了默认的全FF或者是上电初态的全0
-                        if ({dyn_rd_value[31:8], fl_rd_data} != 32'hFFFF_FFFF && {dyn_rd_value[31:8], fl_rd_data} != 32'h0000_0000) begin
+                        if (dyn_param_value_valid(dyn_rd_value)) begin
                             dyn_param_from_flash_valid <= 1'b1;
-                            dyn_param_from_flash_value <= {dyn_rd_value[31:8], fl_rd_data};
+                            dyn_param_from_flash_value <= dyn_rd_value;
                             dyn_param_ok_pulse <= 1'b1;
                         end else begin
                             dyn_param_from_flash_valid <= 1'b0;
@@ -961,12 +1073,11 @@ module top (
                             if (dyn_rd_from_auto) begin
                                 dyn_store_req_from_key <= 1'b1;
                                 dyn_store_req_value <= dyn_auto_check_value;
-                            end else if (dyn_key_locked_snapshot) begin
-                                dyn_store_req_from_key <= 1'b1;
-                                dyn_store_req_value <= dyn_key_value_snapshot;
+                                dyn_param_store_pending <= 1'b1;
                             end else if (dynamic_comp_ready) begin
                                 dyn_store_req_from_key <= 1'b1;
                                 dyn_store_req_value <= comp_param_fixed;
+                                dyn_param_store_pending <= 1'b1;
                             end
                         end
                         if (dyn_rd_from_auto) begin
@@ -974,6 +1085,7 @@ module top (
                             dyn_rd_from_auto <= 1'b0;
                         end else if (dyn_boot_check_pending) begin
                             dyn_boot_check_pending <= 1'b0;
+                            dyn_rd_from_auto <= 1'b0;
                         end
                     end else begin
                         dyn_rd_byte_idx <= dyn_rd_byte_idx + 2'd1;
@@ -985,39 +1097,98 @@ module top (
                 if (!dyn_store_wait_done && !flash_busy) begin
                     md_param_valid <= 1'b1;
                     case (dyn_store_byte_idx)
-                        2'd0: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd0; md_param_data <= dyn_param_save_value[31:24]; end
-                        2'd1: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd1; md_param_data <= dyn_param_save_value[23:16]; end
-                        2'd2: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd2; md_param_data <= dyn_param_save_value[15:8]; end
-                        default: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd3; md_param_data <= dyn_param_save_value[7:0]; end
+                        2'd0: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd0; md_param_data <= dyn_store_req_from_key ? dyn_store_req_value[31:24] : dyn_param_save_value[31:24]; end
+                        2'd1: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd1; md_param_data <= dyn_store_req_from_key ? dyn_store_req_value[23:16] : dyn_param_save_value[23:16]; end
+                        2'd2: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd2; md_param_data <= dyn_store_req_from_key ? dyn_store_req_value[15:8] : dyn_param_save_value[15:8]; end
+                        default: begin md_param_addr <= DYN_PARAM_BASE_ADDR + 24'd3; md_param_data <= dyn_store_req_from_key ? dyn_store_req_value[7:0] : dyn_param_save_value[7:0]; end
                     endcase
                     dyn_store_wait_done <= 1'b1;
-                end else if (dyn_store_wait_done && flash_done) begin
+                end else if (dyn_store_wait_done && write_done) begin
                     dyn_store_wait_done <= 1'b0;
                     md_param_valid <= 1'b0; // 确保写完当前字节后撤销有效标志
                     // 更新下一字节的地址和数据（即使当前拍 flash_done 也会在下拍生效）
                     if (dyn_store_byte_idx < 2'd3) begin
                         md_param_addr <= DYN_PARAM_BASE_ADDR + {22'd0, dyn_store_byte_idx + 2'd1};
                         case (dyn_store_byte_idx)
-                            2'd0: md_param_data <= dyn_param_save_value[23:16];
-                            2'd1: md_param_data <= dyn_param_save_value[15:8];
-                            default: md_param_data <= dyn_param_save_value[7:0];
+                            2'd0: md_param_data <= dyn_store_req_from_key ? dyn_store_req_value[23:16] : dyn_param_save_value[23:16];
+                            2'd1: md_param_data <= dyn_store_req_from_key ? dyn_store_req_value[15:8] : dyn_param_save_value[15:8];
+                            default: md_param_data <= dyn_store_req_from_key ? dyn_store_req_value[7:0] : dyn_param_save_value[7:0];
                         endcase
                     end
                     if (dyn_store_byte_idx == 2'd3) begin
                         dyn_store_active <= 1'b0;
                         dyn_store_byte_idx <= 2'd0;
-                        dyn_param_from_flash_valid <= 1'b1;
-                        dyn_param_from_flash_value <= dyn_param_save_value;
+                        dyn_param_store_pending <= 1'b0;
                         dyn_store_done_pulse <= 1'b1;
+                        dyn_store_verify_active <= 1'b1;
+                        dyn_store_verify_wait <= 1'b0;
+                        dyn_store_verify_delay <= 1'b0;
+                        dyn_store_verify_byte_idx <= 2'd0;
+                        dyn_store_verify_value <= 32'sd0;
+                        dyn_store_verify_expected <= dyn_store_req_from_key ? dyn_store_req_value : dyn_param_save_value;
+                        dyn_store_verify_timeout_cnt <= 26'd0;
                     end else begin
                         dyn_store_byte_idx <= dyn_store_byte_idx + 2'd1;
                     end
-                end else if (dyn_store_wait_done && flash_error) begin
+                end else if (dyn_store_wait_done && (flash_error || (flash_done && !write_done))) begin
                     dyn_store_wait_done <= 1'b0;
                     md_param_valid <= 1'b0;
                     dyn_store_active <= 1'b0;
                     dyn_store_byte_idx <= 2'd0;
+                    dyn_param_store_pending <= 1'b0;
                     dyn_store_fail_pulse <= 1'b1;
+                end
+            end
+
+            if (dyn_store_verify_active) begin
+                if (dyn_store_verify_timeout_cnt < DYN_RD_TIMEOUT_CYC) begin
+                    dyn_store_verify_timeout_cnt <= dyn_store_verify_timeout_cnt + 26'd1;
+                end
+                if (dyn_store_verify_timeout_cnt >= DYN_RD_TIMEOUT_CYC) begin
+                    dyn_store_verify_active <= 1'b0;
+                    dyn_store_verify_wait <= 1'b0;
+                    dyn_store_verify_delay <= 1'b0;
+                    dyn_store_verify_byte_idx <= 2'd0;
+                    dyn_store_verify_value <= 32'sd0;
+                    dyn_store_verify_expected <= 32'sd0;
+                    dyn_store_verify_timeout_cnt <= 26'd0;
+                    dyn_param_from_flash_valid <= 1'b0;
+                    dyn_param_from_flash_value <= 32'sd0;
+                    dyn_param_empty_pulse <= 1'b1;
+                end else if (!dyn_store_verify_wait && !flash_busy) begin
+                    dyn_fl_rd_req <= 1'b1;
+                    dyn_fl_rd_addr <= DYN_PARAM_BASE_ADDR + {22'd0, dyn_store_verify_byte_idx};
+                    dyn_store_verify_wait <= 1'b1;
+                end else if (dyn_store_verify_wait && fl_rd_data_valid) begin
+                    case (dyn_store_verify_byte_idx)
+                        2'd0: dyn_store_verify_value[31:24] <= fl_rd_data;
+                        2'd1: dyn_store_verify_value[23:16] <= fl_rd_data;
+                        2'd2: dyn_store_verify_value[15:8]  <= fl_rd_data;
+                        default: dyn_store_verify_value[7:0] <= fl_rd_data;
+                    endcase
+                    dyn_store_verify_wait <= 1'b0;
+                    dyn_fl_rd_req <= 1'b0;
+                    dyn_store_verify_timeout_cnt <= 26'd0;
+                    dyn_store_verify_delay <= 1'b1;
+                end else if (dyn_store_verify_delay) begin
+                    dyn_store_verify_delay <= 1'b0;
+                    if (dyn_store_verify_byte_idx == 2'd3) begin
+                        dyn_store_verify_active <= 1'b0;
+                        dyn_store_verify_byte_idx <= 2'd0;
+                        dyn_store_verify_timeout_cnt <= 26'd0;
+                        if (dyn_param_value_valid(dyn_store_verify_value) &&
+                            (dyn_store_verify_value == dyn_store_verify_expected)) begin
+                            dyn_param_from_flash_valid <= 1'b1;
+                            dyn_param_from_flash_value <= dyn_store_verify_value;
+                            dyn_store_report_pending <= 1'b1;
+                        end else begin
+                            dyn_param_from_flash_valid <= 1'b0;
+                            dyn_param_from_flash_value <= 32'sd0;
+                            dyn_param_empty_pulse <= 1'b1;
+                        end
+                    end else begin
+                        dyn_store_verify_byte_idx <= dyn_store_verify_byte_idx + 2'd1;
+                    end
                 end
             end
 
@@ -1108,6 +1279,43 @@ module top (
             //         end
             //     end
             // end
+
+            // dump结束后读取动态补偿参数
+            // 由 dyn_param_manager 统一管理：检测 dump_done_flag 上升沿触发读取
+            if (dump_done_flag && !dump_done_flag_d1 && !dump_dyn_rd_active &&
+                !dyn_rd_active && !dyn_store_active && !dyn_store_verify_active && !flash_busy) begin
+                dump_dyn_rd_active   <= 1'b1;
+                dump_dyn_rd_wait     <= 1'b0;
+                dump_dyn_rd_byte_idx <= 2'd0;
+                dump_dyn_rd_value    <= 32'sd0;
+            end
+
+            if (dump_dyn_rd_active) begin
+                if (!dump_dyn_rd_wait && !flash_busy) begin
+                    dyn_fl_rd_req  <= 1'b1;
+                    dyn_fl_rd_addr <= DYN_PARAM_BASE_ADDR + {22'd0, dump_dyn_rd_byte_idx};
+                    dump_dyn_rd_wait <= 1'b1;
+                end else if (dump_dyn_rd_wait && fl_rd_data_valid) begin
+                    case (dump_dyn_rd_byte_idx)
+                        2'd0: dump_dyn_rd_value[31:24] <= fl_rd_data;
+                        2'd1: dump_dyn_rd_value[23:16] <= fl_rd_data;
+                        2'd2: dump_dyn_rd_value[15:8]  <= fl_rd_data;
+                        2'd3: dump_dyn_rd_value[7:0]   <= fl_rd_data;
+                    endcase
+                    dump_dyn_rd_wait <= 1'b0;
+                    dyn_fl_rd_req <= 1'b0;
+                    dump_dyn_rd_delay <= 1'b1;
+                end else if (dump_dyn_rd_delay) begin
+                    dump_dyn_rd_delay <= 1'b0;
+                    if (dump_dyn_rd_byte_idx == 2'd3) begin
+                        dump_dyn_rd_active   <= 1'b0;
+                        dump_dyn_rd_byte_idx <= 2'd0;
+                        dump_dyn_rd_done     <= 1'b1;
+                    end else begin
+                        dump_dyn_rd_byte_idx <= dump_dyn_rd_byte_idx + 2'd1;
+                    end
+                end
+            end
         end
     end
 
@@ -1416,17 +1624,29 @@ module top (
         .dump_start_lw       (dump_start_lw),
         .state_cmd  (uart_cmd),
         .cmd_valid  (uart_cmd_valid),
+        .dyn_read_cmd_pulse (dyn_read_cmd_pulse),
+        .dyn_write_cmd_pulse (dyn_write_cmd_pulse),
         .tx_en      (tx_en),
         .tx_done    (uart_tx_done),
         .fifo_write_cnt (fifo_total_write_cnt), // 修复：连接到正确的FIFO写入计数器
-        .dbg_flash_state    (dbg_flash_state),    // Flash状态机当前状态
+        .dbg_flash_state    (flash_state_dbg),    // Flash状态机当前状态
         .check_fifo_cnt (flash_check_fifo_cnt),  // ST_CHECK_FIFO进入次数
         .fifo_re_done_cnt (flash_fifo_re_done_cnt), // FIFO读取完成次数
         .fifo_latch_done_cnt (flash_fifo_latch_done_cnt), // FIFO锁存完成次数
         .fifo_prog_cnt (flash_fifo_prog_cnt), // FIFO实际写入Flash字数
         .fifo_was_empty_at_dump (flash_fifo_was_empty_at_dump), // dump开始时FIFO是否为空
         .fifo_state_at_dump_start (dump_start_fifo_state), // dump开始FIFO状态
-        .fifo_total_cnt_at_dump_start (dump_start_fifo_cnt)  // dump开始累计写入字数
+        .fifo_total_cnt_at_dump_start (dump_start_fifo_cnt),  // dump开始累计写入字数
+        .dump_dyn_done (dump_dyn_done),
+        .dump_dyn_value (dump_dyn_value),
+        .dyn_ready_in (dynamic_comp_ready),
+        .comp_locked_in (comp_param_locked),
+        .comp_init_cnt_in (comp_init_cnt),
+        .gps_stable_in (gps_stable),
+        .gps_lost_in (gps_lost),
+        .dump_active_in (dump_active),
+        .dyn_rd_active_in (dyn_rd_active),
+        .dyn_store_active_in (dyn_store_active)
     );
 
     // ------------------------------------------------------------------------
@@ -1550,7 +1770,7 @@ module top (
         .read_start_addr (dump_read_start_addr),
         .use_word_limit  (dump_active && (dump_word_limit != 16'd0)),
         .word_limit      (dump_word_limit),
-        .ff_stop_run     (8'd16),
+        .ff_stop_run     (8'd5),  // 从 16 改为 5，连续5个0xFFFFFFFF停止
         .rd_req          (fl_rd_req),
         .rd_addr         (fl_rd_addr),
         .rd_data         (fl_rd_data),

@@ -181,9 +181,11 @@ module flash_controller_enhanced (
     localparam [23:0] ADDR_TABLE_BASE    = 24'h000000;
     localparam [23:0] ADDR_TABLE_SIZE    = 24'h001000;
     localparam [23:0] DIFF_DATA_BASE     = 24'h100000;  // 训练/回放差值区（扩大地址空间）
+    localparam [23:0] DYN_PARAM_BASE     = 24'h3E0000;  // 动态参数区
+    localparam [23:0] META_DATA_BASE     = 24'h3F0000;  // 元数据区
     localparam [23:0] DIFF_DATA_END      = 24'h3DFFFF;  // 预留 0x3E0000/0x3F0000 给动态参数/元数据
     localparam [23:0] ERASE_ALL_BASE     = 24'h000000;
-    localparam [23:0] ERASE_ALL_END      = 24'h3FF000;
+    localparam [23:0] ERASE_ALL_END      = META_DATA_BASE; // 必须覆盖 DYN_PARAM_BASE 所在整扇区
     localparam [23:0] PARAM_DATA_BASE    = 24'h010000;  // 老化参数区
     localparam [7:0]  TABLE_MAGIC        = 8'h55;
     localparam [6:0]  TABLE_ENTRY_SIZE   = 7'd64;  // 64字节/条目
@@ -663,9 +665,11 @@ module flash_controller_enhanced (
                 // ====================================================================
                 ST_CHECK_NEED_ERASE: begin
                     if (param_write_pending) begin
-                        // 根据用户要求，取消单次写入前的自动擦除。
-                        // 如果需要保留旧数据，可以直接进行写入（注意如果不擦除直接写可能导致数据异常，但遵循用户指定逻辑）
-                        state <= ST_WREN_PROG;
+                        if (need_erase) begin
+                            state <= ST_WREN_ERASE;
+                        end else begin
+                            state <= ST_WREN_PROG;
+                        end
                     end else if (need_erase) begin
                         state <= ST_WREN_ERASE;
                     end else begin
@@ -768,12 +772,14 @@ module flash_controller_enhanced (
                 ST_CHECK_FIFO: begin
                     if (cur_addr >= DIFF_DATA_END) begin
                         state <= ST_DONE;
-                    // 极简版逻辑：只要 FIFO 不是空的，就读出来写进 Flash！
-                    // 不再受限于 full_flag 或 flush_pending。
-                    // 这样每次有1个新数据，就立刻触发写入，极其方便排错。
                     end else if (!fifo_empty_flag) begin
+                        // FIFO有数据，继续读取
                         state <= ST_FIFO_RE;
+                    end else if (collect_stop || dump_flush_force) begin
+                        // 有外部停止/flush信号时，保持本状态等待数据或超时
+                        state <= ST_CHECK_FIFO;
                     end else begin
+                        // 无数据且无外部信号时，可以结束
                         state <= ST_DONE;
                     end
                 end
@@ -842,6 +848,8 @@ module flash_controller_enhanced (
                             // 修复：将复杂的嵌套条件选择拆分，以降低MUX综合复杂度，解决布线冲突
                             if (param_write_pending) begin
                                 txn_b4 <= param_data_latched;
+                                cur_addr_dbg <= cur_addr;
+                                last_prog_word_mirror <= {24'd0, param_data_latched};
                             end else if (prog_byte_idx == 2'd0) begin
                                 txn_b4 <= prog_word[31:24];
                             end else if (prog_byte_idx == 2'd1) begin
@@ -994,7 +1002,11 @@ module flash_controller_enhanced (
                 end
 
                 ST_ERASE_ALL_NEXT: begin
-                    // 每个扇区 4KB = 0x1000，差值区 0x001000-0x00FFFF 共 15 个扇区
+                    // 每个扇区 4KB = 0x1000，全擦除流程需要覆盖：
+                    //   0x000000 地址表区
+                    //   0x100000-0x3DFFFF 差值区
+                    //   0x3E0000 动态参数区
+                    //   0x3F0000 元数据区
                     if (erase_sector_cur + 24'h1000 <= ERASE_ALL_END) begin
                         erase_sector_cur <= erase_sector_cur + 24'h1000;
                         state <= ST_ERASE_ALL_WREN;

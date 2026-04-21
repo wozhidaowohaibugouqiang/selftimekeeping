@@ -61,11 +61,12 @@ end
 // DPPS 生成逻辑（改进版 v3 - 清晰的状态机）
 // ========================================================================
 // 生成精准的1Hz DPPS信号，脉冲宽度与GPS PPS一致
-reg signed [31:0] comp_offset_cycles;  // 补偿偏移量（用于后续的差值补偿）
 wire signed [31:0] dpps_offset_signed;
 wire signed [31:0] dpps_period_target;
 reg [31:0] dpps_phase_cnt;             // 相位计数器（0 ~ 50M-1）
 reg [31:0] dpps_pulse_cnt;             // 脉冲宽度计数器
+reg [31:0] dpps_period_limit_q;
+reg [31:0] dpps_period_target_q;
 
 // 独立的自由运行计数器，用于测量GPS和DPPS的实际周期
 reg [31:0] free_cnt;  // 50MHz自由运行计数器（不复位）
@@ -93,7 +94,17 @@ assign dpps_period_target = DPPS_PERIOD + dpps_offset_signed;
 
 // 新增：调试输出
 assign dbg_dpps_offset = dpps_offset;
-assign dbg_dpps_period_target = dpps_period_target;
+assign dbg_dpps_period_target = dpps_period_target_q;
+
+always @(posedge clk or negedge sys_rst_n) begin
+    if(!sys_rst_n) begin
+        dpps_period_limit_q <= DPPS_PERIOD[31:0] - 32'd1;
+        dpps_period_target_q <= DPPS_PERIOD[31:0];
+    end else begin
+        dpps_period_target_q <= dpps_period_target[31:0];
+        dpps_period_limit_q <= dpps_period_target[31:0] - 32'd1;
+    end
+end
 
 always @(posedge clk or negedge sys_rst_n) begin
     if(!sys_rst_n) begin
@@ -102,7 +113,7 @@ always @(posedge clk or negedge sys_rst_n) begin
         dpps <= 1'b0;
     end else begin
         // 相位计数器逻辑：从0递增到DPPS_PERIOD-1，然后复位
-        if (dpps_phase_cnt >= (dpps_period_target - 1)) begin
+        if (dpps_phase_cnt >= dpps_period_limit_q) begin
             // 到达周期末尾，复位计数器并启动脉冲
             dpps_phase_cnt <= 32'd0;
             dpps_pulse_cnt <= 32'd0;
@@ -161,11 +172,11 @@ reg        gps_edge_since_dpps; // 最近1秒内是否看到GPS边沿
 reg [1:0]  gps_miss_sec_cnt;    // 连续丢GPS秒计数（用于中途插拔废窗）
 
 // 计算中间变量
-reg signed [31:0] period_diff;
-reg signed [31:0] avg_period_diff;
-reg signed [31:0] mag;
-reg signed [31:0] init_total;
-reg signed [31:0] init_avg;
+wire [31:0] gps_window_cycles_next;
+wire signed [31:0] window_diff_next;
+
+assign gps_window_cycles_next = gps_total_cycles + (free_cnt - gps_phase_cnt_prev);
+assign window_diff_next = $signed(gps_window_cycles_next) - $signed(dpps_total_cycles);
 
 always @(posedge clk or negedge sys_rst_n) begin
     if(!sys_rst_n) begin
@@ -188,18 +199,10 @@ always @(posedge clk or negedge sys_rst_n) begin
         gps_pps_posedge <= 1'b0;
         diff_valid_flag <= 1'b0;
         dbg_diff_valid <= 1'b0;
-        comp_offset_cycles <= 32'sd0;
     end else begin
         diff_valid_flag <= 1'b0;
         dbg_diff_valid <= 1'b0;
         gps_pps_posedge <= gps_pps_posedge_int;
-
-        // 处理初始差值
-        if (init_diff_valid) begin
-            init_total <= init_diff[7] ? -$signed({25'd0, init_diff[6:0]}) : $signed({25'd0, init_diff[6:0]});
-            init_avg <= init_total >>> 4;
-            comp_offset_cycles <= comp_offset_cycles + init_avg;
-        end
 
         // 每个DPPS上升沿：记录本地实际周期（用于动态残差）
         // 同时做轻量GPS稳定检测：若连续2秒未见GPS边沿，则判为波动并废弃当前窗口
@@ -279,12 +282,10 @@ always @(posedge clk or negedge sys_rst_n) begin
 
                         if (gps_cnt == 4'd15) begin
                             // 满16个1s区间（0s->16s）完成，输出整窗结果
-                            gps_window_cycles_dbg <= gps_total_cycles + (free_cnt - gps_phase_cnt_prev);
+                            gps_window_cycles_dbg <= gps_window_cycles_next;
                             dpps_window_cycles_dbg <= dpps_total_cycles;
 
-                            period_diff <= $signed(gps_total_cycles + (free_cnt - gps_phase_cnt_prev)) - $signed(dpps_total_cycles);
-                            diff_result <= $signed(gps_total_cycles + (free_cnt - gps_phase_cnt_prev)) - $signed(dpps_total_cycles);
-                            avg_period_diff <= ($signed(gps_total_cycles + (free_cnt - gps_phase_cnt_prev)) - $signed(dpps_total_cycles)) >>> 4;
+                            diff_result <= window_diff_next;
 
                             // 仅在GPS连续稳定2个完整16s周期之后，才对外发布有效差值
                             if (gps_warmup_win_cnt >= 3'd1) begin

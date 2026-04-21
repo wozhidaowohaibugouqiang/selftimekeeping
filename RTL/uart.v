@@ -1,3 +1,19 @@
+// ================================================================================
+// Module: uart
+// File: RTL/uart.v
+// Description: UART communication module with command parsing and telemetry output
+// Author: fjl
+// Created: 2026-03-10
+// Version: v2.0
+// ================================================================================
+// VERILOG STANDARD: This file uses SystemVerilog (IEEE 1800-2017) features.
+// IMPORTANT: When editing this file, ensure:
+//   - All port declarations inside module(...) end with semicolons (,)
+//   - input/output declarations are inside the module port list
+//   - Use 'input wire', 'output wire', 'output reg', 'input signed [N:0]' syntax
+//   - function declarations use 'function [N:0] funcname;' not 'function funcname;'
+// ================================================================================
+
 `timescale 1ns / 1ps
 
 module uart (
@@ -93,24 +109,37 @@ module uart (
     input  wire [1:0]  fifo_state_at_dump_start,
     input  wire [15:0] fifo_total_cnt_at_dump_start,
     input  wire [31:0] last_prog_word,
+    input  wire        dump_dyn_done,     // dump结束后动态参数读取完成
+    input  wire [31:0] dump_dyn_value,     // 动态补偿参数值
+    // 调试信息：参数锁定状态
+    input  wire        dyn_ready_in,        // dynamic_comp_ready 信号
+    input  wire        comp_locked_in,     // comp_param_locked 信号
+    input  wire [3:0]  comp_init_cnt_in,   // comp_init_cnt 信号
+    input  wire        gps_stable_in,      // gps_stable 信号
+    input  wire        gps_lost_in,        // gps_lost 信号
+    input  wire        dump_active_in,      // dump_active 信号
+    input  wire        dyn_rd_active_in,   // dyn_rd_active 信号
+    input  wire        dyn_store_active_in // dyn_store_active 信号
 
     // Dump stream interface (from top)
-    input  wire        dump_mode,
-    input  wire        dump_word_valid,
-    input  wire [23:0] dump_word_addr,
-    input  wire [31:0] dump_word_data,
-    input  wire        dump_done,
-    input  wire        dump_meta_valid,
-    input  wire [15:0] dump_meta_fwe,
-    input  wire [15:0] dump_meta_fre,
-    input  wire [15:0] dump_meta_limit,
-    input  wire [15:0] dump_meta_exported,
-    output wire        dump_word_ready,
-    output wire        dump_meta_ready,
-    output reg  [3:0]  state_cmd,
-    output reg         cmd_valid,
-    output wire        tx_en,
-    output wire        tx_done
+    ,input  wire        dump_mode
+    ,input  wire        dump_word_valid
+    ,input  wire [23:0] dump_word_addr
+    ,input  wire [31:0] dump_word_data
+    ,input  wire        dump_done
+    ,input  wire        dump_meta_valid
+    ,input  wire [15:0] dump_meta_fwe
+    ,input  wire [15:0] dump_meta_fre
+    ,input  wire [15:0] dump_meta_limit
+    ,input  wire [15:0] dump_meta_exported
+    ,output wire        dump_word_ready
+    ,output wire        dump_meta_ready
+    ,output reg  [3:0]  state_cmd
+    ,output reg         cmd_valid
+    ,output wire        tx_en
+    ,output wire        tx_done
+    ,output reg         dyn_read_cmd_pulse   // 'D' 命令：读取动态补偿参数
+    ,output reg         dyn_write_cmd_pulse   // 'W' 命令：写入当前动态补偿参数到Flash
 );
 
     // ========================================================================
@@ -181,9 +210,13 @@ module uart (
             cmd_valid <= 1'b0;
             rx_received_flag <= 1'b0;
             erase_cmd_reg <= 1'b0;
+            dyn_read_cmd_pulse <= 1'b0;
+            dyn_write_cmd_pulse <= 1'b0;
         end else begin
             cmd_valid <= 1'b0;
             erase_cmd_reg <= 1'b0;
+            dyn_read_cmd_pulse <= 1'b0;
+            dyn_write_cmd_pulse <= 1'b0;
 
             if (rx_vld) begin
                 rx_received_flag <= 1'b1;
@@ -203,6 +236,14 @@ module uart (
                         state_cmd <= 4'b0000;
                         cmd_valid <= 1'b1;
                     end else if (cmd_buf[0] == "S") begin
+                        state_cmd <= 4'b0000;
+                        cmd_valid <= 1'b1;
+                    end else if (cmd_buf[0] == "D") begin
+                        dyn_read_cmd_pulse <= 1'b1;
+                        state_cmd <= 4'b0000;
+                        cmd_valid <= 1'b1;
+                    end else if (cmd_buf[0] == "W") begin
+                        dyn_write_cmd_pulse <= 1'b1;
                         state_cmd <= 4'b0000;
                         cmd_valid <= 1'b1;
                     end
@@ -315,6 +356,7 @@ module uart (
     localparam [3:0] MSG_READ_START  = 4'd7;
     localparam [3:0] MSG_DYN_OK      = 4'd8;
     localparam [3:0] MSG_DYN_EMPTY   = 4'd9;
+    localparam [3:0] MSG_DYN_DUMP    = 4'd10;
 
     reg [3:0] tx_msg_type;
     reg [7:0] tx_data_mux;
@@ -323,7 +365,9 @@ module uart (
     reg        dump_done_sent;
     reg        dyn_ok_req;
     reg        dyn_empty_req;
+    reg        dyn_dump_req;
     reg signed [31:0] dyn_read_value_latched;
+    reg [31:0] dump_dyn_value_latched;
 
     function [7:0] hex8_at;
         input [7:0] value;
@@ -383,7 +427,7 @@ module uart (
         begin
             case (msg)
                 MSG_REPLY:       tx_msg_len = 8'd9;
-                MSG_HEARTBEAT:   tx_msg_len = 8'd108;
+                MSG_HEARTBEAT:   tx_msg_len = 8'd71;  // 增加 FP,FB,FS 调试字段
                 MSG_DUMP_WORD:   tx_msg_len = 8'd27;
                 MSG_DUMP_DONE:   tx_msg_len = 8'd3;
                 MSG_ERASE_START: tx_msg_len = 8'd13;
@@ -391,6 +435,7 @@ module uart (
                 MSG_READ_START:  tx_msg_len = 8'd12;
                 MSG_DYN_OK:      tx_msg_len = 8'd21;
                 MSG_DYN_EMPTY:   tx_msg_len = 8'd11;
+                MSG_DYN_DUMP:    tx_msg_len = 8'd18;
                 default:         tx_msg_len = 8'd0;
             endcase
         end
@@ -399,8 +444,17 @@ module uart (
     function [7:0] tx_msg_byte;
         input [3:0] msg;
         input [7:0] idx;
+        reg [7:0] rdy_byte;
         begin
             tx_msg_byte = 8'h0A;
+            // 计算 RDY 字节
+            rdy_byte = {2'b00,
+                        dyn_store_active_in,
+                        dyn_rd_active_in,
+                        dump_active_in,
+                        gps_lost_in,
+                        comp_locked_in,
+                        gps_stable_in};
             case (msg)
                 MSG_REPLY: begin
                     case (idx)
@@ -417,43 +471,57 @@ module uart (
                 end
 
                 MSG_HEARTBEAT: begin
+                    // 格式: DIFF=XXXXXX,CA=XXXXXX,PT=XXXXXXXX,DO=XXXX,RDY=XX,FP=XXXX,FB=X,FS=X
+                    // RDY 字段：bit[5]=dyn_store_active, bit[4]=dyn_rd_active
+                    // bit[3]=dump_active, bit[2]=gps_lost, bit[1]=comp_locked, bit[0]=gps_stable
+                    // 新增: FP=fifo_prog_cnt(实际写入Flash字数), FB=flash_busy, FS=flash_state
                     case (idx)
-                        8'd0: tx_msg_byte = "C";     8'd1: tx_msg_byte = ":";
-                        8'd2: tx_msg_byte = hex2ascii(dbg_pps_cnt[7:4]);
-                        8'd3: tx_msg_byte = hex2ascii(dbg_pps_cnt[3:0]);
-                        8'd4: tx_msg_byte = ",";
-                        8'd5: tx_msg_byte = "D";     8'd6: tx_msg_byte = "I";     8'd7: tx_msg_byte = "F";     8'd8: tx_msg_byte = "F";     8'd9: tx_msg_byte = ":";
-                        8'd10: tx_msg_byte = diff_disp[31] ? "-" : "+";
-                        8'd17: tx_msg_byte = ",";
-                        8'd18: tx_msg_byte = "C";    8'd19: tx_msg_byte = "A";    8'd20: tx_msg_byte = ":";
-                        8'd21: tx_msg_byte = comp_fixed_disp[31] ? "-" : "+";
-                        8'd28: tx_msg_byte = ",";
-                        8'd29: tx_msg_byte = "P";    8'd30: tx_msg_byte = "T";    8'd31: tx_msg_byte = ":";
-                        8'd40: tx_msg_byte = ",";
-                        8'd41: tx_msg_byte = "D";    8'd42: tx_msg_byte = "O";    8'd43: tx_msg_byte = ":";
-                        8'd44: tx_msg_byte = dpps_offset_dbg[23] ? "-" : "+";
-                        8'd51: tx_msg_byte = ",";
-                        8'd52: tx_msg_byte = "Q";    8'd53: tx_msg_byte = ":";     8'd54: tx_msg_byte = dyn_q_dbg[31] ? "-" : "+";
-                        8'd61: tx_msg_byte = ",";
-                        8'd62: tx_msg_byte = "R";    8'd63: tx_msg_byte = ":";     8'd64: tx_msg_byte = dyn_r_dbg[31] ? "-" : "+";
-                        8'd67: tx_msg_byte = ",";
-                        8'd68: tx_msg_byte = "D";    8'd69: tx_msg_byte = "S";    8'd70: tx_msg_byte = ":";     8'd71: tx_msg_byte = dyn_ds_dbg[31] ? "-" : "+";
-                        8'd80: tx_msg_byte = ",";
-                        8'd81: tx_msg_byte = "L";    8'd82: tx_msg_byte = "D";    8'd83: tx_msg_byte = ":";     8'd84: tx_msg_byte = dyn_ld_dbg[31] ? "-" : "+";
-                        8'd93: tx_msg_byte = ",";
-                        8'd94: tx_msg_byte = "R";    8'd95: tx_msg_byte = "S";    8'd96: tx_msg_byte = ":";     8'd97: tx_msg_byte = dyn_rs_dbg[31] ? "-" : "+";
-                        8'd106: tx_msg_byte = 8'h0D;
+                        // DIFF=+XXXXXX (12 bytes: D,I,F,F,=,+,-,6 hex)
+                        8'd0:  tx_msg_byte = "D";    8'd1: tx_msg_byte = "I";    8'd2: tx_msg_byte = "F";    8'd3: tx_msg_byte = "F";    8'd4: tx_msg_byte = "=";
+                        8'd5: tx_msg_byte = diff_disp[31] ? "-" : "+";
+                        8'd12: tx_msg_byte = ",";
+                        // CA=+XXXXXXXX (12 bytes: C,A,=,+,-,8 hex)
+                        8'd13: tx_msg_byte = "C";    8'd14: tx_msg_byte = "A";    8'd15: tx_msg_byte = "=";
+                        8'd16: tx_msg_byte = comp_fixed_disp[31] ? "-" : "+";
+                        8'd25: tx_msg_byte = ",";
+                        // PT=XXXXXXXX (10 bytes: P,T,=,+,-,6 hex)
+                        8'd26: tx_msg_byte = "P";    8'd27: tx_msg_byte = "T";    8'd28: tx_msg_byte = "=";
+                        8'd29: tx_msg_byte = dpps_period_target_dbg[31] ? "-" : "+";
+                        8'd37: tx_msg_byte = ",";
+                        // DO=XXXX (6 bytes: D,O,=,+,-,2 hex)
+                        8'd38: tx_msg_byte = "D";    8'd39: tx_msg_byte = "O";    8'd40: tx_msg_byte = "=";
+                        8'd41: tx_msg_byte = dpps_offset_dbg[23] ? "-" : "+";
+                        8'd45: tx_msg_byte = ",";
+                        // RDY=XX (6 bytes: R,D,Y,=,2 hex)
+                        8'd46: tx_msg_byte = "R";    8'd47: tx_msg_byte = "D";    8'd48: tx_msg_byte = "Y";    8'd49: tx_msg_byte = "=";
+                        8'd50: tx_msg_byte = hex2ascii(rdy_byte[7:4]);
+                        8'd51: tx_msg_byte = hex2ascii(rdy_byte[3:0]);
+                        8'd52: tx_msg_byte = ",";
+                        // FP=XXXX (7 bytes: F,P,=,4 hex)
+                        8'd53: tx_msg_byte = "F";    8'd54: tx_msg_byte = "P";    8'd55: tx_msg_byte = "=";
+                        8'd59: tx_msg_byte = ",";
+                        // FB=X (5 bytes: F,B,=,1 hex)
+                        8'd60: tx_msg_byte = "F";    8'd61: tx_msg_byte = "B";    8'd62: tx_msg_byte = "=";
+                        8'd64: tx_msg_byte = ",";
+                        // FS=X (5 bytes: F,S,=,1 hex)
+                        8'd65: tx_msg_byte = "F";    8'd66: tx_msg_byte = "S";    8'd67: tx_msg_byte = "=";
+                        8'd69: tx_msg_byte = 8'h0D;
                         default: tx_msg_byte = 8'h0A;
                     endcase
-                    if (idx >= 8'd11 && idx <= 8'd16)  tx_msg_byte = hex24_at(diff_abs[23:0], idx - 8'd11);
-                    if (idx >= 8'd22 && idx <= 8'd27)  tx_msg_byte = hex24_at(comp_fixed_abs[23:0], idx - 8'd22);
-                    if (idx >= 8'd32 && idx <= 8'd39)  tx_msg_byte = hex32_at(dpps_period_target_dbg, idx - 8'd32);
-                    if (idx >= 8'd45 && idx <= 8'd50)  tx_msg_byte = hex24_at(doffs_abs, idx - 8'd45);
-                    if (idx >= 8'd55 && idx <= 8'd60)  tx_msg_byte = hex24_at(dyn_q_abs[23:0], idx - 8'd55);
-                    if (idx >= 8'd65 && idx <= 8'd66)  tx_msg_byte = hex8_at(dyn_r_abs[7:0], idx - 8'd65);
-                    if (idx >= 8'd72 && idx <= 8'd79)  tx_msg_byte = hex32_at(dyn_ds_abs, idx - 8'd72);
-                    if (idx >= 8'd85 && idx <= 8'd92)  tx_msg_byte = hex32_at(dyn_ld_abs, idx - 8'd85);
-                    if (idx >= 8'd98 && idx <= 8'd105) tx_msg_byte = hex32_at(dyn_rs_abs, idx - 8'd98);
+                    // DIFF abs: idx 6-11 (6 hex digits for 24-bit value)
+                    if (idx >= 8'd6 && idx <= 8'd11)  tx_msg_byte = hex24_at(diff_abs[23:0], idx - 8'd6);
+                    // CA abs: idx 17-24 (8 hex digits for 32-bit value)
+                    if (idx >= 8'd17 && idx <= 8'd24)  tx_msg_byte = hex32_at(comp_fixed_abs, idx - 8'd17);
+                    // PT: idx 30-36 (6 hex digits for 24-bit value)
+                    if (idx >= 8'd30 && idx <= 8'd36)  tx_msg_byte = hex24_at(dpps_period_target_dbg[23:0], idx - 8'd30);
+                    // DO abs: idx 42-44 (4 hex digits for 16-bit value)
+                    if (idx >= 8'd42 && idx <= 8'd44) tx_msg_byte = hex16_at(doffs_abs[15:0], idx - 8'd42);
+                    // FP: idx 56-59 (4 hex digits for 16-bit fifo_prog_cnt)
+                    if (idx >= 8'd56 && idx <= 8'd59) tx_msg_byte = hex16_at(fifo_prog_cnt[15:0], idx - 8'd56);
+                    // FB: idx 63 (1 hex digit for flash_busy)
+                    if (idx == 8'd63) tx_msg_byte = hex2ascii({3'b000, flash_busy});
+                    // FS: idx 68 (1 hex digit for flash_state)
+                    if (idx == 8'd68) tx_msg_byte = hex2ascii(dbg_flash_state[3:0]);
                 end
                 MSG_DUMP_WORD: begin
                     case (idx)
@@ -523,6 +591,18 @@ module uart (
                     endcase
                 end
 
+                MSG_DYN_DUMP: begin
+                    // 格式: DYN:DUMP,CA=XXXXXXXX,CRLF (18字节)
+                    case (idx)
+                        8'd0: tx_msg_byte = "D"; 8'd1: tx_msg_byte = "Y"; 8'd2: tx_msg_byte = "N"; 8'd3: tx_msg_byte = ":";
+                        8'd4: tx_msg_byte = "D"; 8'd5: tx_msg_byte = "U"; 8'd6: tx_msg_byte = "M"; 8'd7: tx_msg_byte = "P"; 8'd8: tx_msg_byte = ",";
+                        8'd9: tx_msg_byte = "C"; 8'd10: tx_msg_byte = "A"; 8'd11: tx_msg_byte = "=";
+                        8'd18: tx_msg_byte = 8'h0D;
+                        default: tx_msg_byte = 8'h0A;
+                    endcase
+                    if (idx >= 8'd12 && idx <= 8'd17) tx_msg_byte = hex32_at(dump_dyn_value_latched, idx - 8'd12);
+                end
+
                 default: tx_msg_byte = 8'h0A;
             endcase
         end
@@ -541,7 +621,9 @@ module uart (
             read_start_req  <= 1'b0;
             dyn_ok_req      <= 1'b0;
             dyn_empty_req   <= 1'b0;
+            dyn_dump_req    <= 1'b0;
             dyn_read_value_latched <= 32'sd0;
+            dump_dyn_value_latched <= 32'd0;
         end else begin
             if (erase_start_pulse) erase_start_req <= 1'b1;
             if (erase_done_pulse)  erase_done_req  <= 1'b1;
@@ -552,20 +634,25 @@ module uart (
             end
             if (flash_dyn_empty)
                 dyn_empty_req <= 1'b1;
+            if (dump_dyn_done) begin
+                dyn_dump_req <= 1'b1;
+                dump_dyn_value_latched <= dump_dyn_value;
+            end
             if (tx_state == ST_TX_IDLE) begin
                 if (erase_start_req)      erase_start_req <= 1'b0;
                 else if (erase_done_req)  erase_done_req  <= 1'b0;
                 else if (read_start_req)  read_start_req  <= 1'b0;
                 else if (dyn_ok_req)      dyn_ok_req      <= 1'b0;
                 else if (dyn_empty_req)   dyn_empty_req   <= 1'b0;
+                else if (dyn_dump_req)    dyn_dump_req    <= 1'b0;
             end
         end
     end
 
     assign dump_word_ready = (tx_state == ST_TX_IDLE) && !reply_req && !hb_req && !cmd_valid
-                             && !erase_start_req && !erase_done_req && !read_start_req && !dyn_ok_req && !dyn_empty_req;
+                             && !erase_start_req && !erase_done_req && !read_start_req && !dyn_ok_req && !dyn_empty_req && !dyn_dump_req;
     assign dump_meta_ready = (tx_state == ST_TX_IDLE) && !dump_word_valid && !reply_req && !hb_req && !cmd_valid
-                             && !erase_start_req && !erase_done_req && !read_start_req && !dyn_ok_req && !dyn_empty_req;
+                             && !erase_start_req && !erase_done_req && !read_start_req && !dyn_ok_req && !dyn_empty_req && !dyn_dump_req;
 
     // TX状态机：直接流式发送，不使用BRAM/tx_buf缓存
     always @(posedge sys_clk or negedge sys_rst_n) begin
@@ -586,7 +673,20 @@ module uart (
                     if (!dump_done)
                         dump_done_sent <= 1'b0;
 
-                    if (erase_start_req) begin
+                    // D命令响应优先级最高（立即回复，不被心跳覆盖）
+                    if (dyn_ok_req) begin
+                        tx_msg_type <= MSG_DYN_OK;
+                        tx_len <= tx_msg_len(MSG_DYN_OK);
+                        tx_state <= ST_TX_SEND;
+                    end else if (dyn_empty_req) begin
+                        tx_msg_type <= MSG_DYN_EMPTY;
+                        tx_len <= tx_msg_len(MSG_DYN_EMPTY);
+                        tx_state <= ST_TX_SEND;
+                    end else if (dyn_dump_req) begin
+                        tx_msg_type <= MSG_DYN_DUMP;
+                        tx_len <= tx_msg_len(MSG_DYN_DUMP);
+                        tx_state <= ST_TX_SEND;
+                    end else if (erase_start_req) begin
                         tx_msg_type <= MSG_ERASE_START;
                         tx_len <= tx_msg_len(MSG_ERASE_START);
                         tx_state <= ST_TX_SEND;
@@ -597,14 +697,6 @@ module uart (
                     end else if (read_start_req) begin
                         tx_msg_type <= MSG_READ_START;
                         tx_len <= tx_msg_len(MSG_READ_START);
-                        tx_state <= ST_TX_SEND;
-                    end else if (dyn_ok_req) begin
-                        tx_msg_type <= MSG_DYN_OK;
-                        tx_len <= tx_msg_len(MSG_DYN_OK);
-                        tx_state <= ST_TX_SEND;
-                    end else if (dyn_empty_req) begin
-                        tx_msg_type <= MSG_DYN_EMPTY;
-                        tx_len <= tx_msg_len(MSG_DYN_EMPTY);
                         tx_state <= ST_TX_SEND;
                     end else if (dump_mode && dump_word_valid) begin
                         dump_addr_latched <= dump_word_addr;

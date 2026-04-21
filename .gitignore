@@ -1,0 +1,38 @@
+# Build outputs
+*.vcd
+*.wlf
+*.log
+*.wdb
+work/
+modelsim.ini
+
+# IDE files
+.idea/
+*.swp
+*.swo
+*~
+.vscode/
+*.sublime-*
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+*.rej
+.DS_Store
+Thumbs.db
+
+# Project specific
+.lock.f
+.recent_user_depot.ini
+*.zip
+*.dmp
+run.log
+transcript
+self_timekeeping_Runs/
+
+# Simulation outputs
+sim_debug*.log
+tb_fifo.vcd
+vish_stacktrace.vstf
+vsim.wlf
