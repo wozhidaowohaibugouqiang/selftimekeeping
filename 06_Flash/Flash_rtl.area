@@ -1,0 +1,34 @@
+standard
+***Report Model: Flash***
+
+IO Statistics
+#IO                     7
+  #input                3
+  #output               4
+  #inout                0
+
+Gate Statistics
+#Basic gates          253
+  #and                 18
+  #nand                 0
+  #or                   1
+  #nor                  0
+  #xor                  0
+  #xnor                 0
+  #buf                  0
+  #not                 16
+  #bufif1               0
+  #MX21                46
+  #FADD                 0
+  #DFF                172
+  #LATCH                0
+#MACRO_ADD             13
+#MACRO_EQ               7
+#MACRO_MUX            235
+
+Report Hierarchy Area:
++-----------------------------------------+
+|Instance |Module |gates  |seq    |macros |
++-----------------------------------------+
+|top      |Flash  |81     |172    |20     |
++-----------------------------------------+

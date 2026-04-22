@@ -1,0 +1,60 @@
+============================================================
+   Tang Dynasty, V6.2.178840
+   Copyright (c) 2012-2025 Anlogic Inc.
+   Executable = E:/td6.2.1/bin/td.exe
+   Built at =   14:07:58 Sep  4 2025
+   Run by =     Lenovo
+   Run Date =   Fri Mar 27 16:34:55 2026
+
+   Run on =     YORINE
+============================================================
+PRJ-5303 WARNING: Run syn_1 failed.
+HDL-5333 WARNING: data object 'dbg_rd_first_byte' is already declared in top.v(237)
+HDL-5007 WARNING: second declaration of 'dbg_rd_first_byte' is ignored in top.v(237)
+HDL-5333 WARNING: data object 'dbg_rd_first_valid' is already declared in top.v(238)
+HDL-5007 WARNING: second declaration of 'dbg_rd_first_valid' is ignored in top.v(238)
+HDL-5007 WARNING: literal value 'sh800 truncated to fit in 9 bits in RTL/avg_remain_comp.v(62)
+HDL-5007 WARNING: literal value 'd256 truncated to fit in 8 bits in RTL/dynamic_comp_coeff.v(43)
+HDL-5007 WARNING: loop variable declaration is not allowed in this mode of Verilog in RTL/dynamic_comp_coeff.v(75)
+HDL-5007 WARNING: loop variable declaration is not allowed in this mode of Verilog in RTL/dynamic_comp_coeff.v(104)
+HDL-5007 WARNING: literal value 'd64 truncated to fit in 6 bits in RTL/flash_controller_enhanced.v(146)
+HDL-5007 WARNING: literal value 'd49999999 truncated to fit in 25 bits in RTL/param_manager.v(118)
+HDL-5007 WARNING: literal value 'd16 truncated to fit in 4 bits in RTL/param_manager.v(234)
+HDL-5333 WARNING: data object 'fl_rd_req' is already declared in top.v(241)
+HDL-5007 WARNING: second declaration of 'fl_rd_req' is ignored in top.v(241)
+HDL-5333 WARNING: data object 'fl_rd_addr' is already declared in top.v(242)
+HDL-5007 WARNING: second declaration of 'fl_rd_addr' is ignored in top.v(242)
+HDL-5333 WARNING: data object 'fl_rd_data' is already declared in top.v(243)
+HDL-5007 WARNING: second declaration of 'fl_rd_data' is ignored in top.v(243)
+HDL-5333 WARNING: data object 'fl_rd_data_valid' is already declared in top.v(244)
+HDL-5007 WARNING: second declaration of 'fl_rd_data_valid' is ignored in top.v(244)
+HDL-5333 WARNING: data object 'dbg_rd_first_byte' is already declared in top.v(245)
+HDL-5007 WARNING: second declaration of 'dbg_rd_first_byte' is ignored in top.v(245)
+HDL-5333 WARNING: data object 'dbg_rd_first_valid' is already declared in top.v(246)
+HDL-5007 WARNING: second declaration of 'dbg_rd_first_valid' is ignored in top.v(246)
+HDL-5007 WARNING: literal value 'sh800 truncated to fit in 9 bits in RTL/avg_remain_comp.v(62)
+HDL-5007 WARNING: literal value 'd256 truncated to fit in 8 bits in RTL/dynamic_comp_coeff.v(43)
+HDL-5007 WARNING: loop variable declaration is not allowed in this mode of Verilog in RTL/dynamic_comp_coeff.v(75)
+HDL-5007 WARNING: loop variable declaration is not allowed in this mode of Verilog in RTL/dynamic_comp_coeff.v(104)
+HDL-5007 WARNING: literal value 'd64 truncated to fit in 6 bits in RTL/flash_controller_enhanced.v(152)
+HDL-5007 WARNING: literal value 'd49999999 truncated to fit in 25 bits in RTL/param_manager.v(118)
+HDL-5007 WARNING: literal value 'd16 truncated to fit in 4 bits in RTL/param_manager.v(234)
+HDL-5333 WARNING: data object 'fl_rd_req' is already declared in top.v(242)
+HDL-5007 WARNING: second declaration of 'fl_rd_req' is ignored in top.v(242)
+HDL-5333 WARNING: data object 'fl_rd_addr' is already declared in top.v(243)
+HDL-5007 WARNING: second declaration of 'fl_rd_addr' is ignored in top.v(243)
+HDL-5333 WARNING: data object 'fl_rd_data' is already declared in top.v(244)
+HDL-5007 WARNING: second declaration of 'fl_rd_data' is ignored in top.v(244)
+HDL-5333 WARNING: data object 'fl_rd_data_valid' is already declared in top.v(245)
+HDL-5007 WARNING: second declaration of 'fl_rd_data_valid' is ignored in top.v(245)
+HDL-5333 WARNING: data object 'dbg_rd_first_byte' is already declared in top.v(246)
+HDL-5007 WARNING: second declaration of 'dbg_rd_first_byte' is ignored in top.v(246)
+HDL-5333 WARNING: data object 'dbg_rd_first_valid' is already declared in top.v(247)
+HDL-5007 WARNING: second declaration of 'dbg_rd_first_valid' is ignored in top.v(247)
+HDL-5007 WARNING: literal value 'sh800 truncated to fit in 9 bits in RTL/avg_remain_comp.v(62)
+HDL-5007 WARNING: literal value 'd256 truncated to fit in 8 bits in RTL/dynamic_comp_coeff.v(43)
+HDL-5007 WARNING: loop variable declaration is not allowed in this mode of Verilog in RTL/dynamic_comp_coeff.v(75)
+HDL-5007 WARNING: loop variable declaration is not allowed in this mode of Verilog in RTL/dynamic_comp_coeff.v(104)
+HDL-5007 WARNING: literal value 'd64 truncated to fit in 6 bits in RTL/flash_controller_enhanced.v(153)
+HDL-5007 WARNING: literal value 'd49999999 truncated to fit in 25 bits in RTL/param_manager.v(118)
+HDL-5007 WARNING: literal value 'd16 truncated to fit in 4 bits in RTL/param_manager.v(234)

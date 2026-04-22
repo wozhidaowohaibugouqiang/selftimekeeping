@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ipxact:design xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014" xmlns:anlogic="http" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd">
+    <ipxact:vendor>anlogic.com</ipxact:vendor>
+    <ipxact:library>customized</ipxact:library>
+    <ipxact:name>design_SPI_0</ipxact:name>
+    <ipxact:version>1.0</ipxact:version>
+    <ipxact:componentInstances>
+        <ipxact:componentInstance>
+            <ipxact:instanceName>SPI_Master_c06a3a2e2c87_Inst</ipxact:instanceName>
+            <ipxact:componentRef vendor="anlogic.com" library="ip" name="SPI" version="1.0"/>
+            <ipxact:configurableElementValues>
+                <ipxact:configurableElementValue referenceId="Number_of_Select_Signals">1</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="Sys_Clk_Rate">50000000</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="SCLK_Rate">5000000</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="SS_n_Setup_Time_Display">20</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="SS_n_Hold_Time_Display">20</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="SS_n_Setup_Time">1</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="Data_Width">8</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="Actual_SCLK_Rate">5000000</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="SS_n_Hold_Time">1</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="Actual_SS_n_Setup_Time">20</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="Actual_SS_n_Hold_Time">20</ipxact:configurableElementValue>
+                <ipxact:configurableElementValue referenceId="Divide_Factor">10</ipxact:configurableElementValue>
+            </ipxact:configurableElementValues>
+        </ipxact:componentInstance>
+    </ipxact:componentInstances>
+    <ipxact:adHocConnections>
+        <ipxact:adHocConnection>
+            <ipxact:name>Sys_Clk</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="Sys_Clk_Master"/>
+                <ipxact:externalPortReference portRef="Sys_Clk"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>Rst_n</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="Rst_n_Master"/>
+                <ipxact:externalPortReference portRef="Rst_n"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>Address</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="Address_Master"/>
+                <ipxact:externalPortReference portRef="Address"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>Data_to_IP</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="Data_to_IP_Master"/>
+                <ipxact:externalPortReference portRef="Data_to_IP"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>Write</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="Write_Master"/>
+                <ipxact:externalPortReference portRef="Write"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>Data_from_IP</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="Data_from_IP_Master"/>
+                <ipxact:externalPortReference portRef="Data_from_IP"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>Read</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="Read_Master"/>
+                <ipxact:externalPortReference portRef="Read"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>TOE</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="TOE_Master"/>
+                <ipxact:externalPortReference portRef="TOE"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>ROE</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="ROE_Master"/>
+                <ipxact:externalPortReference portRef="ROE"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>TRDY</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="TRDY_Master"/>
+                <ipxact:externalPortReference portRef="TRDY"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>RRDY</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="RRDY_Master"/>
+                <ipxact:externalPortReference portRef="RRDY"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>SCLK</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="SCLK_Master"/>
+                <ipxact:externalPortReference portRef="SCLK"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>MOSI</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="MOSI_Master"/>
+                <ipxact:externalPortReference portRef="MOSI"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>MISO</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="MISO_Master"/>
+                <ipxact:externalPortReference portRef="MISO"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+        <ipxact:adHocConnection>
+            <ipxact:name>SS_n</ipxact:name>
+            <ipxact:portReferences>
+                <ipxact:internalPortReference componentRef="SPI_Master_c06a3a2e2c87_Inst" portRef="SS_n_Master"/>
+                <ipxact:externalPortReference portRef="SS_n"/>
+            </ipxact:portReferences>
+        </ipxact:adHocConnection>
+    </ipxact:adHocConnections>
+    <ipxact:vendorExtensions>
+        <anlogic:device>EF2M45LG48B</anlogic:device>
+        <anlogic:displayname>SPI</anlogic:displayname>
+        <anlogic:ipGenVersion value="171484 2025/08/11">1.0</anlogic:ipGenVersion>
+    </ipxact:vendorExtensions>
+</ipxact:design>

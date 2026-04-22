@@ -1,0 +1,673 @@
+﻿Reading D:/modeltech64_10.7/tcl/vsim/pref.tcl
+
+# 10.7
+
+# cd {E:/fjlwork/selftimekeep}
+# reading modelsim.ini
+#  set ::SELF_TIMEKEEP_PROJ_DIR {E:/fjlwork/selftimekeep}
+# E:/fjlwork/selftimekeep
+#  set ::ANLOGIC_SIM_LIB_ROOT {E:/TD_6.2.1/sim_release/ph1}
+# E:/TD_6.2.1/sim_release/ph1
+#  do {E:/fjlwork/selftimekeep/sim/run_fifo.do}
+# E:/fjlwork/selftimekeep
+# INFO: PROJ_DIR = E:/fjlwork/selftimekeep
+# E:/TD_6.2.1/sim_release/ph1
+# E:/TD_6.2.1/sim_release
+# INFO: ANLOGIC_SIM_LIB_ROOT = E:/TD_6.2.1/sim_release
+# INFO: ANLOGIC_PH1_DIR = E:/TD_6.2.1/sim_release/ph1
+# 1
+# E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v
+# E:/fjlwork/selftimekeep/al_ip/FIFO_0.v
+# E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v
+# E:/TD_6.2.1/sim_release/ph1/ph1_phy_config_v2.sv E:/TD_6.2.1/sim_release/ph1/ph1_phy_fifoctrl.v E:/TD_6.2.1/sim_release/ph1/ph1_phy_eram.v E:/TD_6.2.1/sim_release/ph1/ph1_phy_gsr.v
+# reading modelsim.ini
+# E:/fjlwork/selftimekeep/sim/modelsim_run_fifo.log
+# 0
+# 0
+# catch {vdel -all}
+# 0
+# 
+# set WORK_LIB_DIR [file join $PROJ_DIR work]
+# E:/fjlwork/selftimekeep/work
+# catch {vmap -c}
+# 0
+# vlib $WORK_LIB_DIR
+# vmap work $WORK_LIB_DIR
+# Model Technology ModelSim SE-64 vmap 10.7 Lib Mapping Utility 2017.12 Dec  7 2017
+# vmap work E:/fjlwork/selftimekeep/work 
+# Modifying modelsim.ini
+# if {[catch {vmap work} WORK_MAP_INFO]} {
+#     echo "ERROR: work 库映射失败（vmap work 失败）"
+#     return
+# } else {
+#     echo "INFO: $WORK_MAP_INFO"
+# }
+# INFO: Model Technology ModelSim SE-64 vmap 10.7 Lib Mapping Utility 2017.12 Dec  7 2017
+# vmap work 
+# Reading modelsim.ini
+# "work" maps to directory E:/fjlwork/selftimekeep/work.
+# catch {vdel -lib work -all}
+# 0
+# 
+# if {$::USE_VENDOR_FIFO} {
+#     foreach f $ANLOGIC_LIB_FILES {
+#         if {[catch {vlog -sv -work work $f} MSG]} { echo "ERROR: $MSG"; return }
+#     }
+# }
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:31 on Jan 16,2026
+# vlog -sv -work work E:/TD_6.2.1/sim_release/ph1/ph1_phy_config_v2.sv 
+# -- Compiling module PH1_PHY_CONFIG_V2
+# 
+# Top level modules:
+# 	PH1_PHY_CONFIG_V2
+# End time: 16:03:32 on Jan 16,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:32 on Jan 16,2026
+# vlog -sv -work work E:/TD_6.2.1/sim_release/ph1/ph1_phy_fifoctrl.v 
+# -- Compiling module PH1_PHY_FIFOCTRL
+# -- Compiling module PH1_PHY_FIFOCONTROLLER
+# -- Compiling module AL_FIFOCTRL_fifo_sync2dff
+# -- Compiling module AL_FIFOCTRL_bin2gray
+# -- Compiling module AL_FIFOCTRL_gray2bin
+# -- Compiling module AL_FIFOCTRL_writectrl
+# -- Compiling module AL_FIFOCTRL_readctrl
+# 
+# Top level modules:
+# 	PH1_PHY_FIFOCTRL
+# End time: 16:03:32 on Jan 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:32 on Jan 16,2026
+# vlog -sv -work work E:/TD_6.2.1/sim_release/ph1/ph1_phy_eram.v 
+# -- Compiling module PH1_PHY_ERAM
+# 
+# Top level modules:
+# 	PH1_PHY_ERAM
+# End time: 16:03:32 on Jan 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:32 on Jan 16,2026
+# vlog -sv -work work E:/TD_6.2.1/sim_release/ph1/ph1_phy_gsr.v 
+# -- Compiling module PH1_PHY_GSR
+# 
+# Top level modules:
+# 	PH1_PHY_GSR
+# End time: 16:03:33 on Jan 16,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+# 
+# if {[catch {vlog -sv -work work [file join $PROJ_DIR sim glbl.v]} MSG]} { echo "ERROR: $MSG"; return }
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:33 on Jan 16,2026
+# vlog -sv -work work E:/fjlwork/selftimekeep/sim/glbl.v 
+# -- Compiling module glbl
+# 
+# Top level modules:
+# 	glbl
+# End time: 16:03:33 on Jan 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# if {[catch {vlog -sv -work work $FIFO_IP_FILE} MSG]} { echo "ERROR: $MSG"; return }
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:33 on Jan 16,2026
+# vlog -sv -work work E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v 
+# -- Compiling module FIFO_0
+# 
+# Top level modules:
+# 	FIFO_0
+# End time: 16:03:33 on Jan 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# if {[catch {vlog -sv -work work [file join $PROJ_DIR RTL fifo.v]} MSG]} { echo "ERROR: $MSG"; return }
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:33 on Jan 16,2026
+# vlog -sv -work work E:/fjlwork/selftimekeep/RTL/fifo.v 
+# -- Compiling module fifo
+# 
+# Top level modules:
+# 	fifo
+# End time: 16:03:33 on Jan 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# if {[catch {vlog -sv -work work [file join $PROJ_DIR sim timekeeping_core.v]} MSG]} { echo "ERROR: $MSG"; return }
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:33 on Jan 16,2026
+# vlog -sv -work work E:/fjlwork/selftimekeep/sim/timekeeping_core.v 
+# -- Compiling module timekeeping_core
+# 
+# Top level modules:
+# 	timekeeping_core
+# End time: 16:03:33 on Jan 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# if {[catch {vlog -sv -work work [file join $PROJ_DIR sim tb_fifo.v]} MSG]} { echo "ERROR: $MSG"; return }
+# Model Technology ModelSim SE-64 vlog 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:33 on Jan 16,2026
+# vlog -sv -work work E:/fjlwork/selftimekeep/sim/tb_fifo.v 
+# -- Compiling module tb_fifo
+# 
+# Top level modules:
+# 	tb_fifo
+# End time: 16:03:33 on Jan 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# 
+# set REQUIRED_UNITS [list tb_fifo fifo timekeeping_core FIFO_0]
+# tb_fifo fifo timekeeping_core FIFO_0
+# set WORK_LISTING ""
+# if {[catch {set WORK_LISTING [vdir work]} VDIR_WORK_ERR]} {
+#     if {[catch {set WORK_LISTING [vdir -lib work]} VDIR_WORK_ERR2]} {
+#         echo "ERROR: 无法访问 work 库内容"
+#         echo "ERROR: $VDIR_WORK_ERR"
+#         echo "ERROR: $VDIR_WORK_ERR2"
+#         return
+#     }
+# }
+# echo "INFO: work 库内容如下："
+# INFO: work 库内容如下：
+# echo "$WORK_LISTING"
+# Library vendor : Model Technology
+# Maximum unnamed designs : 3
+# PROTECTED DU 430d89
+# PROTECTED DU caa3708
+# MODULE AL_FIFOCTRL_bin2gray
+# MODULE AL_FIFOCTRL_fifo_sync2dff
+# MODULE AL_FIFOCTRL_gray2bin
+# MODULE AL_FIFOCTRL_readctrl
+# MODULE AL_FIFOCTRL_writectrl
+# PROTECTED DU 1a24053
+# PROTECTED DU 7d3c8a6
+# PROTECTED DU cb41076
+# PROTECTED DU ae3cb25
+# PROTECTED DU cd58993
+# PROTECTED DU a5aa4f4
+# PROTECTED DU 1938135
+# PROTECTED DU 309cc78
+# PROTECTED DU d5aefa2
+# PROTECTED DU cd5ad1c
+# PROTECTED DU 294c3ce
+# PROTECTED DU d5ad077
+# PROTECTED DU d5aeb49
+# PROTECTED DU 9cd5b21
+# PROTECTED DU cd5bc19
+# PROTECTED DU cd5bc1f
+# PROTECTED DU ae3f8f5
+# PROTECTED DU bb555db
+# PROTECTED DU ecf8024
+# PROTECTED DU ecd2d8d
+# PROTECTED DU bd089f2
+# PROTECTED DU ff80673
+# PROTECTED DU 14b49b2
+# PROTECTED DU 5e5886d
+# PROTECTED DU 9cd5fb3
+# PROTECTED DU 9cd6034
+# PROTECTED DU 508a21d
+# PROTECTED DU 95443d7
+# PROTECTED DU cd61ce7
+# PROTECTED DU e181a62
+# PROTECTED DU e18f0c3
+# PROTECTED DU 830ea0e
+# PROTECTED DU bfb9872
+# PROTECTED DU 9cd63a7
+# PROTECTED DU 4cf3896
+# PROTECTED DU d6573b7
+# PROTECTED DU 3b23cb3
+# PROTECTED DU 3b23cb7
+# PROTECTED DU d318674
+# PROTECTED DU 203a957
+# PROTECTED DU e058bce
+# PROTECTED DU a583a5e
+# PROTECTED DU d5c7c42
+# PROTECTED DU 4be4785
+# PROTECTED DU 9cd69dd
+# PROTECTED DU a177205
+# PROTECTED DU d58f28c
+# PROTECTED DU aed90fd
+# PROTECTED DU bfd1896
+# PROTECTED DU 6d28010
+# PROTECTED DU 2168cd0
+# PROTECTED DU c1297c0
+# PROTECTED DU 2673a0
+# PROTECTED DU 85ab110
+# PROTECTED DU ffe92a0
+# PROTECTED DU cfbcd20
+# PROTECTED DU 5455c52
+# PROTECTED DU 913eb08
+# PROTECTED DU 4afc9b8
+# PROTECTED DU dfbd974
+# PROTECTED DU 97592b0
+# PROTECTED DU d5f8928
+# PROTECTED DU 4d5f904
+# PROTECTED DU c0aa713
+# PROTECTED DU c99c6e0
+# PROTECTED DU f8c99c7
+# PROTECTED DU dc0604c
+# PROTECTED DU ee82b62
+# PROTECTED DU 922d328
+# PROTECTED DU 17f196e
+# PROTECTED DU 773f9b8
+# PROTECTED DU dfe7628
+# PROTECTED DU fe5c766
+# PROTECTED DU 54dec9d
+# MODULE fifo
+# MODULE FIFO_0
+# MODULE glbl
+# PROTECTED DU 61256f0
+# MODULE PH1_PHY_CONFIG_V2
+# PROTECTED DU a44764
+# PROTECTED DU 40fe7b4
+# MODULE PH1_PHY_ERAM
+# MODULE PH1_PHY_FIFOCONTROLLER
+# MODULE PH1_PHY_FIFOCTRL
+# MODULE PH1_PHY_GSR
+# MODULE tb_fifo
+# MODULE timekeeping_core
+# PROTECTED DU e9d5eb2
+# foreach u $REQUIRED_UNITS {
+#     if {![regexp -nocase "\\y${u}\\y" $WORK_LISTING]} {
+#         echo "ERROR: 设计单元未生成/不可见: work.$u"
+#         return
+#     }
+# }
+# if {$::USE_VENDOR_FIFO} {
+#     if {$FIFO_IP_FILE eq $FIFO_IP_SIM} {
+#         set REQUIRED_ANLOGIC_UNITS [list PH1_PHY_CONFIG_V2 PH1_PHY_FIFOCTRL PH1_PHY_ERAM PH1_PHY_GSR]
+#     } else {
+#         set REQUIRED_ANLOGIC_UNITS [list PH1_LOGIC_FIFO]
+#     }
+#     foreach u $REQUIRED_ANLOGIC_UNITS {
+#         if {![regexp -nocase "\\y${u}\\y" $WORK_LISTING]} {
+#             echo "ERROR: Anlogic 依赖模块缺失: work.$u"
+#             return
+#         }
+#     }
+# }
+# 
+# catch {unalias vsim}
+# 1
+# catch {unalias vopt}
+# 1
+# catch {unalias vdel}
+# 1
+# set USE_FALLBACK_NOVOPT 0
+# 0
+# if {$::USE_VENDOR_FIFO && ($FIFO_IP_FILE eq $FIFO_IP_SIM)} {
+#     set VOPT_TOPS [list work.tb_fifo work.PH1_PHY_GSR]
+# } else {
+#     set VOPT_TOPS [list work.tb_fifo]
+# }
+# work.tb_fifo work.PH1_PHY_GSR
+# if {[catch {eval vopt +acc $VOPT_TOPS -o tb_fifo_opt} VOPT_ERR]} {
+#     echo "WARN: vopt 展开失败，准备回退到 vsim -novopt"
+#     echo "WARN: $VOPT_ERR"
+#     echo "WARNINFO: $errorInfo"
+#     echo "WARNLOG: $TRANSCRIPT_FILE"
+#     set USE_FALLBACK_NOVOPT 1
+# }
+# Model Technology ModelSim SE-64 vopt 10.7 Compiler 2017.12 Dec  7 2017
+# Start time: 16:03:33 on Jan 16,2026
+# vopt "+acc" work.tb_fifo work.PH1_PHY_GSR -o tb_fifo_opt 
+# 
+# Top level modules:
+# 	tb_fifo
+# 	PH1_PHY_GSR
+# 
+# Analyzing design...
+# -- Loading module tb_fifo
+# -- Loading module timekeeping_core
+# -- Loading module fifo
+# -- Loading module FIFO_0
+# -- Loading module PH1_PHY_CONFIG_V2
+# -- Loading module PH1_PHY_FIFOCTRL
+# -- Loading module PH1_PHY_FIFOCONTROLLER
+# -- Loading module AL_FIFOCTRL_writectrl
+# -- Loading module AL_FIFOCTRL_bin2gray
+# -- Loading module AL_FIFOCTRL_gray2bin
+# -- Loading module AL_FIFOCTRL_fifo_sync2dff
+# -- Loading module AL_FIFOCTRL_readctrl
+# -- Loading module PH1_PHY_ERAM
+# -- Loading module glbl
+# -- Loading module PH1_PHY_GSR
+# Optimizing 98 design-units (inlining 463/571 module instances, 59/59 UDP instances):
+# -- Optimizing module PH1_PHY_CONFIG_V2(fast)
+# -- Optimizing module PH1_PHY_ERAM(fast__1)
+# -- Optimizing module PH1_PHY_ERAM(fast)
+# -- Optimizing module FIFO_0(fast)
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(64): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst'.  Expected 18, found 16.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(64): (vopt-2718) [TFMPC] - Missing connection for port 'fifo_almostfull'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(64): (vopt-2718) [TFMPC] - Missing connection for port 'fifo_almostempty'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_123'.  Expected 32, found 10.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_re'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_we'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_raddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_waddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(107): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_152'.  Expected 32, found 10.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_re'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_we'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_raddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_waddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(144): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_181'.  Expected 32, found 8.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'addrb_casout'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'addra_casout'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_re'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_we'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_raddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_waddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(181): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_2'.  Expected 32, found 10.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'addrb_casout'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'addra_casout'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'addrb_casin'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'addra_casin'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(219): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_35'.  Expected 32, found 12.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'addrb_casin'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'addra_casin'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(259): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_36'.  Expected 32, found 10.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_re'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_we'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_raddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_waddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(298): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_65'.  Expected 32, found 10.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_re'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_we'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_raddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_waddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(335): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2685) [TFMPC] - Too few port connections for 'fifo_inst_syn_94'.  Expected 32, found 10.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_re'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_we'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_raddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'fifoctrl_waddr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterrinj'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_dbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'ecc_sbiterr'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'dob_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'doa_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'doa'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'orstb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'web'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'oceb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'addrb'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'dib_extra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'dib'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'orsta'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'wea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'ocea'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'addra'.
+# ** Warning: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(372): (vopt-2718) [TFMPC] - Missing connection for port 'dia_extra'.
+# -- Optimizing module PH1_PHY_FIFOCTRL(fast)
+# -- Optimizing module AL_FIFOCTRL_readctrl(fast)
+# ** Note: (vopt-143) Recognized 1 FSM in module "AL_FIFOCTRL_readctrl(fast)".
+# -- Optimizing module AL_FIFOCTRL_writectrl(fast)
+# -- Optimizing module tb_fifo(fast)
+# -- Optimizing module PH1_PHY_FIFOCONTROLLER(fast)
+# -- Optimizing module timekeeping_core(fast)
+# -- Optimizing module AL_FIFOCTRL_gray2bin(fast)
+# -- Optimizing module fifo(fast)
+# -- Optimizing module AL_FIFOCTRL_fifo_sync2dff(fast)
+# -- Optimizing module PH1_PHY_GSR(fast)
+# -- Optimizing module AL_FIFOCTRL_bin2gray(fast)
+# -- Optimizing module glbl(fast)
+# Optimized design name is tb_fifo_opt
+# End time: 16:03:34 on Jan 16,2026, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 187
+# if {!$USE_FALLBACK_NOVOPT} {
+#     if {[catch {vsim tb_fifo_opt} VSIM_ERR]} {
+#         echo "ERROR: vsim 装载失败"
+#         echo "ERROR: $VSIM_ERR"
+#         echo "ERRORINFO: $errorInfo"
+#         echo "ERRORLOG: $TRANSCRIPT_FILE"
+#         return
+#     }
+# } else {
+#     if {$::USE_VENDOR_FIFO && ($FIFO_IP_FILE eq $FIFO_IP_SIM)} {
+#         set VSIM_TOPS [list work.tb_fifo work.PH1_PHY_GSR]
+#     } else {
+#         set VSIM_TOPS [list work.tb_fifo]
+#     }
+#     if {[catch {eval vsim -novopt $VSIM_TOPS} VSIM_ERR]} {
+#         echo "ERROR: vsim -novopt 装载失败"
+#         echo "ERROR: $VSIM_ERR"
+#         echo "ERRORINFO: $errorInfo"
+#         echo "ERRORLOG: $TRANSCRIPT_FILE"
+#         return
+#     }
+# }
+# vsim tb_fifo_opt 
+# Start time: 16:03:34 on Jan 16,2026
+# //  ModelSim SE-64 10.7 Dec  7 2017
+# //
+# //  Copyright 1991-2017 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  ModelSim SE-64 and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.tb_fifo(fast)
+# Loading work.timekeeping_core(fast)
+# Loading work.fifo(fast)
+# Loading work.FIFO_0(fast)
+# Loading work.PH1_PHY_CONFIG_V2(fast)
+# Loading work.PH1_PHY_FIFOCTRL(fast)
+# Loading work.PH1_PHY_FIFOCONTROLLER(fast)
+# Loading work.AL_FIFOCTRL_writectrl(fast)
+# Loading work.AL_FIFOCTRL_bin2gray(fast)
+# Loading work.AL_FIFOCTRL_gray2bin(fast)
+# Loading work.AL_FIFOCTRL_fifo_sync2dff(fast)
+# Loading work.AL_FIFOCTRL_readctrl(fast)
+# Loading work.PH1_PHY_ERAM(fast)
+# Loading work.PH1_PHY_ERAM(fast__1)
+# Loading work.glbl(fast)
+# Loading work.PH1_PHY_GSR(fast)
+# ** Warning: (vsim-2685) [TFMPC] - Too few port connections for 'config_inst'.  Expected 45, found 0.
+#    Time: 0 ps  Iteration: 0  Instance: /tb_fifo/u_fifo/u_FIFO_0/config_inst File: E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v Line: 54
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'usrtrstn_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'usrtrstn_sel_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ipa_out_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ipb_out_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'dna_clk_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'dna_din_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'dna_shift_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ecc_enable_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ecc_endaddrdebug_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ecc_endaddr_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'multboot_en_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'multboot_code_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'multboot_addr_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'usr_gsr_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'gsr_sync_clk_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'icap_enable_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'icap_clk_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'icap_cs_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'icap_rdwr_n_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'icap_data_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 's_tdoen_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 's_tdo_i'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_rst_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_scanen_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_rti_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_shift_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_update_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_tck_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_tdi_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'cwc_tms_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'dna_do_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ecc_clk_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ecc_stop_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ecc_done_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'ecc_info_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'icap_busy_n_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'icap_data_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'done_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'wakeup_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'wakeup_mux_dly20_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 's_tck_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 's_tms_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 's_tdi_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'csram_addr_o'.
+# ** Warning: (vsim-3722) E:/fjlwork/selftimekeep/al_ip/FIFO_0_sim.v(54): [TFMPC] - Missing connection for port 'csram_data_o'.
+# run -all
+# Time:                    0, Diff: 00, Valid: 0, FIFO_Full: 0, FIFO_Empty: 1, FIFO_RE: 0, FIFO_Dout: ff, Match: 0
+# Time:               250000, Diff: 00, Valid: 0, FIFO_Full: 0, FIFO_Empty: 1, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              1350000, Diff: 0b, Valid: 0, FIFO_Full: 0, FIFO_Empty: 1, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              2450000, Diff: 16, Valid: 1, FIFO_Full: 0, FIFO_Empty: 1, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              2550000, Diff: 16, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              3550000, Diff: 21, Valid: 1, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              3650000, Diff: 21, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              4650000, Diff: 2c, Valid: 1, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              4750000, Diff: 2c, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              5750000, Diff: 37, Valid: 1, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              5850000, Diff: 37, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              6850000, Diff: 42, Valid: 1, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              6950000, Diff: 42, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              7950000, Diff: 4d, Valid: 1, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              8050000, Diff: 4d, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              9050000, Diff: 58, Valid: 1, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:              9150000, Diff: 58, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 0, FIFO_Dout: xx, Match: 0
+# Time:             10050000, Diff: 58, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: xx, Match: 0
+# Time:             10150000, Diff: 63, Valid: 1, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: xx, Match: 0
+# Time:             10250000, Diff: 63, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: 16, Match: 0
+# Time:             10350000, Diff: 63, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: 21, Match: 1
+# Time:             10450000, Diff: 63, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: 2c, Match: 1
+# Time:             10550000, Diff: 63, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: 37, Match: 1
+# Time:             10650000, Diff: 63, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: 42, Match: 1
+# Time:             10750000, Diff: 63, Valid: 0, FIFO_Full: 0, FIFO_Empty: 0, FIFO_RE: 1, FIFO_Dout: 4d, Match: 1
+# 
+# ================== TEST PASSED ==================
+# All FIFO functions verified successfully!
+# ================================================
+# ** Note: $stop    : E:/fjlwork/selftimekeep/sim/tb_fifo.v(199)
+#    Time: 10850 ns  Iteration: 5  Instance: /tb_fifo
+# Break in Module tb_fifo at E:/fjlwork/selftimekeep/sim/tb_fifo.v line 199
+# Stopped at E:/fjlwork/selftimekeep/sim/tb_fifo.v line 199
+#  quit -f
+# End time: 16:03:41 on Jan 16,2026, Elapsed time: 0:00:07
+# Errors: 0, Warnings: 46
+

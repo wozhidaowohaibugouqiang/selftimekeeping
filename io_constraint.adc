@@ -1,0 +1,14 @@
+set_pin_assignment	{ clk }	{ LOCATION = P56; IOSTANDARD = LVCMOS25; PULLTYPE = PULLUP; }
+set_pin_assignment	{ dpps_out }	{ LOCATION = P1; IOSTANDARD = LVCMOS25; DRIVESTRENGTH = 16; PULLTYPE = NONE; }
+set_pin_assignment	{ dump_key }	{ LOCATION = P52; IOSTANDARD = LVCMOS25; PULLTYPE = PULLUP; }
+set_pin_assignment	{ erase_key }	{ LOCATION = P54; IOSTANDARD = LVCMOS25; PULLTYPE = PULLUP; }
+set_pin_assignment	{ gps_led }	{ LOCATION = P141; IOSTANDARD = LVCMOS25; DRIVESTRENGTH = 16; PULLTYPE = NONE; }
+set_pin_assignment	{ gps_pps }	{ LOCATION = P2; IOSTANDARD = LVCMOS25; PULLTYPE = PULLUP; }
+set_pin_assignment	{ rst_n }	{ LOCATION = P19; IOSTANDARD = LVCMOS25; PULLTYPE = PULLUP; }
+set_pin_assignment	{ spi_cs_n }	{ LOCATION = P45; IOSTANDARD = LVCMOS25; DRIVESTRENGTH = 16; PULLTYPE = NONE; }
+set_pin_assignment	{ spi_miso }	{ LOCATION = P48; IOSTANDARD = LVCMOS25; PULLTYPE = NONE; }
+set_pin_assignment	{ spi_mosi }	{ LOCATION = P44; IOSTANDARD = LVCMOS25; DRIVESTRENGTH = 16; PULLTYPE = NONE; }
+set_pin_assignment	{ spi_sclk }	{ LOCATION = P47; IOSTANDARD = LVCMOS25; DRIVESTRENGTH = 16; PULLTYPE = NONE; }
+set_pin_assignment	{ uart_led }	{ LOCATION = P138; IOSTANDARD = LVCMOS25; DRIVESTRENGTH = 16; PULLTYPE = NONE; }
+set_pin_assignment	{ uart_rx }	{ LOCATION = P114; IOSTANDARD = LVCMOS25; PULLTYPE = PULLUP; }
+set_pin_assignment	{ uart_tx }	{ LOCATION = P113; IOSTANDARD = LVCMOS25; DRIVESTRENGTH = 16; PULLTYPE = NONE; }

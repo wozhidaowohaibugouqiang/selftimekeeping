@@ -1,0 +1,15 @@
+Sys_Clk_Master; 1
+Rst_n_Master; 1
+Address_Master; 1
+Data_to_IP_Master; 1
+Write_Master; 1
+Data_from_IP_Master; 1
+Read_Master; 1
+TOE_Master; 1
+ROE_Master; 1
+TRDY_Master; 1
+RRDY_Master; 1
+SCLK_Master; 1
+MOSI_Master; 1
+MISO_Master; 1
+SS_n_Master; 1

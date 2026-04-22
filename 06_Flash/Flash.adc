@@ -1,0 +1,8 @@
+set_pin_assignment {CLK} { LOCATION = P56;  }
+set_pin_assignment {RSTn} { LOCATION = P52;  }
+
+set_pin_assignment {flash_clk} { LOCATION = P47;  }
+set_pin_assignment {flash_cs} { LOCATION = P45;  }
+set_pin_assignment {flash_datain} { LOCATION = P44;  }
+set_pin_assignment {flash_dataout} { LOCATION = P48;  }
+set_pin_assignment {led} { LOCATION = P139;  }

@@ -61,6 +61,7 @@ module flash_controller_enhanced (
 
     // 增强参数接口
     input   [7:0]   param_data,
+    input   [31:0]  param_word_data,
     input   [23:0]  param_addr,
     input           param_valid,
     input   [1:0]   param_type,
@@ -130,6 +131,9 @@ module flash_controller_enhanced (
     reg [7:0]   txn_b2;
     reg [7:0]   txn_b3;
     reg [7:0]   txn_b4;
+    reg [7:0]   txn_b5;
+    reg [7:0]   txn_b6;
+    reg [7:0]   txn_b7;
     wire        txn_busy;
     wire        txn_done;
     wire [7:0]  txn_rx0;
@@ -137,6 +141,9 @@ module flash_controller_enhanced (
     wire [7:0]  txn_rx2;
     wire [7:0]  txn_rx3;
     wire [7:0]  txn_rx4;
+    wire [7:0]  txn_rx5;
+    wire [7:0]  txn_rx6;
+    wire [7:0]  txn_rx7;
 
     spi_driver u_spi_driver (
         .sys_clk    (sys_clk),
@@ -148,6 +155,9 @@ module flash_controller_enhanced (
         .txn_b2     (txn_b2),
         .txn_b3     (txn_b3),
         .txn_b4     (txn_b4),
+        .txn_b5     (txn_b5),
+        .txn_b6     (txn_b6),
+        .txn_b7     (txn_b7),
         .txn_busy   (txn_busy),
         .txn_done   (txn_done),
         .txn_rx0    (txn_rx0),
@@ -155,6 +165,9 @@ module flash_controller_enhanced (
         .txn_rx2    (txn_rx2),
         .txn_rx3    (txn_rx3),
         .txn_rx4    (txn_rx4),
+        .txn_rx5    (txn_rx5),
+        .txn_rx6    (txn_rx6),
+        .txn_rx7    (txn_rx7),
         .spi_sclk   (spi_sclk),
         .spi_mosi   (spi_mosi),
         .spi_miso   (spi_miso),
@@ -305,6 +318,7 @@ module flash_controller_enhanced (
     reg [23:0]  erase_sector_cur;
     // 参数模式信号
     reg [7:0]   param_data_latched;
+    reg [31:0]  param_word_latched;
     reg [23:0]  param_addr_latched;
     reg [1:0]   param_type_latched;
     reg         param_write_pending;
@@ -354,6 +368,9 @@ module flash_controller_enhanced (
             txn_b2              <= 8'h00;
             txn_b3              <= 8'h00;
             txn_b4              <= 8'h00;
+            txn_b5              <= 8'h00;
+            txn_b6              <= 8'h00;
+            txn_b7              <= 8'h00;
             flash_busy          <= 1'b0;
             flash_done          <= 1'b0;
             write_done          <= 1'b0;
@@ -378,6 +395,7 @@ module flash_controller_enhanced (
             erase_pending       <= 1'b0;
             erase_sector_cur    <= ERASE_ALL_BASE;
             param_data_latched  <= 8'h00;
+            param_word_latched  <= 32'h00000000;
             param_addr_latched  <= 24'h000000;
             param_type_latched  <= 2'b00;
             param_write_pending <= 1'b0;
@@ -424,7 +442,7 @@ module flash_controller_enhanced (
                 read_checksum <= 8'h00;
             end
 
-            if (erase_req && !erase_pending && state == ST_IDLE) begin
+            if (erase_req && !erase_pending) begin
                 erase_pending    <= 1'b1;
                 erase_sector_cur <= ERASE_ALL_BASE;
             end
@@ -432,6 +450,7 @@ module flash_controller_enhanced (
             if (param_valid && !param_write_pending) begin
                 param_write_pending <= 1'b1;
                 param_data_latched <= param_data;
+                param_word_latched <= param_word_data;
                 param_addr_latched <= param_addr;
                 param_type_latched <= param_type;
             end
@@ -614,6 +633,9 @@ module flash_controller_enhanced (
                 ST_RD_DONE: begin
                     if (!rd_req) begin
                         state <= ST_IDLE;
+                    end else if (!read_mode && (erase_pending || param_write_pending)) begin
+                        // 允许高优先级维护操作抢占，避免 rd_req 卡高导致擦除/参数写长期无法开始
+                        state <= ST_IDLE;
                     end
                 end
 
@@ -623,6 +645,10 @@ module flash_controller_enhanced (
                 ST_PARAM_WRITE: begin
                     if (!txn_busy) begin
                         cur_addr <= param_addr_latched;
+                        // 参数区域由E命令全片擦除，标记扇区已擦除以跳过冗余擦除
+                        // 这样可以避免擦除+写入的长时间占用（约17秒），减少CA/LC不一致风险
+                        erased_sector_base <= {param_addr_latched[23:12], 12'h000};
+                        prog_byte_idx <= 2'd0;
                         state <= ST_CHECK_NEED_ERASE;
                     end
                 end
@@ -839,7 +865,7 @@ module flash_controller_enhanced (
                             sr_stage_dbg      <= 2'd1;
                             poll_attempts_dbg <= poll_attempts;
                             // PP命令：一次写1字节，需要4次PP完成一个32位字
-                            txn_len   <= 3'd5;
+                            txn_len   <= param_write_pending ? 3'd0 : 3'd5;
                             txn_b0    <= FLASH_CMD_PP;
                             txn_b1    <= cur_addr[23:16];
                             txn_b2    <= cur_addr[15:8];
@@ -847,9 +873,12 @@ module flash_controller_enhanced (
 
                             // 修复：将复杂的嵌套条件选择拆分，以降低MUX综合复杂度，解决布线冲突
                             if (param_write_pending) begin
-                                txn_b4 <= param_data_latched;
+                                txn_b4 <= param_word_latched[31:24];
+                                txn_b5 <= param_word_latched[23:16];
+                                txn_b6 <= param_word_latched[15:8];
+                                txn_b7 <= param_word_latched[7:0];
                                 cur_addr_dbg <= cur_addr;
-                                last_prog_word_mirror <= {24'd0, param_data_latched};
+                                last_prog_word_mirror <= param_word_latched;
                             end else if (prog_byte_idx == 2'd0) begin
                                 txn_b4 <= prog_word[31:24];
                             end else if (prog_byte_idx == 2'd1) begin
@@ -910,6 +939,8 @@ module flash_controller_enhanced (
                 ST_INC_ADDR: begin
                     if (param_write_pending) begin
                         param_write_pending <= 1'b0;
+                        prog_byte_idx <= 2'd0;
+                        cur_addr <= cur_addr + 24'd4;
                         state <= ST_DONE;
                     end else begin
                         // 逐字节写入，每次PP后地址递增1

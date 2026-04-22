@@ -1,0 +1,33 @@
+standard
+***Report Model: Flash***
+
+IO Statistics
+#IO                     7
+  #input                3
+  #output               4
+  #inout                0
+
+Utilization Statistics
+#lut                  383   out of   4480    8.55%
+#reg                  171   out of   4480    3.82%
+#le                   429
+  #lut only           258   out of    429   60.14%
+  #reg only            46   out of    429   10.72%
+  #lut&reg            125   out of    429   29.14%
+#dsp                    0   out of     15    0.00%
+#bram                   0   out of     12    0.00%
+  #bram9k               0
+  #fifo9k               0
+#bram32k                0   out of      6    0.00%
+#pad                    7   out of    109    6.42%
+  #ireg                 0
+  #oreg                 1
+  #treg                 0
+#pll                    0   out of      1    0.00%
+
+Report Hierarchy Area:
++--------------------------------------+
+|Instance |Module |le    |lut   |seq   |
++--------------------------------------+
+|top      |Flash  |429   |383   |171   |
++--------------------------------------+

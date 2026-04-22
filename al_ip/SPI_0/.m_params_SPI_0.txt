@@ -1,0 +1,5 @@
+Number_of_Select_Signals; 1; 1
+Divide_Factor; 1; 10
+SS_n_Setup_Time; 1; 1
+SS_n_Hold_Time; 1; 1
+Data_Width; 1; 8

@@ -1,0 +1,53 @@
+============================================================
+   Tang Dynasty, V6.2.178840
+   Copyright (c) 2012-2025 Anlogic Inc.
+   Executable = E:/td6.2.1/bin/td.exe
+   Built at =   14:07:58 Sep  4 2025
+   Run by =     Lenovo
+   Run Date =   Mon Apr 20 09:18:52 2026
+
+   Run on =     YORINE
+============================================================
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(109)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(109)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(127)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(127)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(128)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(128)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(129)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(129)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(130)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(130)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(131)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(131)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(132)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(132)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(133)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(133)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(134)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(134)
+HDL-8007 ERROR: syntax error near 'input' in RTL/uart.v(135)
+HDL-8007 ERROR: Verilog 2000 keyword 'input' used in incorrect context in RTL/uart.v(135)
+HDL-8007 ERROR: syntax error near 'output' in RTL/uart.v(136)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-8007 ERROR: declarations are not allowed in an unnamed block in RTL/uart.v(468)
+HDL-8007 ERROR: ignore module module due to previous errors in RTL/uart.v(19)
+HDL-8007 ERROR: ignore module module due to previous errors in RTL/uart.v(748)
+HDL-8007 ERROR: ignore module module due to previous errors in RTL/uart.v(801)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_prog_cnt' is not allowed in RTL/flash_controller_enhanced.v(280)
+HDL-5372 WARNING: redeclaration of ANSI port 'fifo_was_empty_at_dump' is not allowed in RTL/flash_controller_enhanced.v(281)

@@ -1,0 +1,18 @@
+Number_of_Select_Signals : 1 : U : En : 1;;2;;3;;4;;5;;6;;7;;8;;9;;10;;11;;12;;13;;14;;15;;16;;17;;18;;19;;20;;21;;22;;23;;24;;25;;26;;27;;28;;29;;30;;31;;32 : 1 : 32
+CPOL : 1 : U : Dis : 0;;1 :  : 
+CPHA : 1 : U : Dis : 0;;1 :  : 
+Enable_RxPartial_Threshold : 0 : U : Dis :  :  : 
+Sys_Clk_Rate : 50000000 : U : En :  : 1000 : 200000000
+SCLK_Rate : 5000000 : U : En :  : 100 : 100000000
+SS_n_Setup_Time_Display : 20 : U : En :  : 0 : 1000
+SS_n_Hold_Time_Display : 20 : U : En :  : 0 : 1000
+SS_n_Setup_Time : 1 : G : En :  :  : 
+Data_Width : 8 : U : En : 8;;9;;10;;11;;12;;13;;14;;15;;16;;17;;18;;19;;20;;21;;22;;23;;24;;25;;26;;27;;28;;29;;30;;31;;32 : 8 : 32
+Actual_SCLK_Rate : 5000000 : G : En :  :  : 
+SS_n_Hold_Time : 1 : G : En :  :  : 
+Shift_Dir : 1 : G : Dis :  :  : 
+Shift_Dir_Display : MSB First : U : Dis : MSB First;;LSB First :  : 
+RxPart_Thld : 1 : U : Dis : 1;;2;;3;;4;;5;;6;;7 : 1 : 7
+Actual_SS_n_Setup_Time : 20 : G : En :  :  : 
+Actual_SS_n_Hold_Time : 20 : G : En :  :  : 
+Divide_Factor : 10 : G : En :  :  : 
